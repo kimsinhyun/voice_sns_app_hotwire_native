@@ -14,7 +14,15 @@
 
     <!-- 회원가입 폼 -->
     <div class="bg-white rounded-3xl shadow-xl p-8">
-      <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { class: "space-y-6" }) do |f| %>
+      <%= form_for(resource, as: resource_name, url: registration_path(resource_name), 
+                   html: { 
+                     class: "space-y-6",
+                     data: { 
+                       controller: "bridge--form",
+                       bridge__form_submit_title_value: "가입",
+                       action: "input->bridge--form#handleInput"
+                     }
+                   }) do |f| %>
         <%= render "devise/shared/error_messages", resource: resource %>
 
         <div>
@@ -42,7 +50,9 @@
         </div>
 
         <div>
-          <%= f.submit "회원가입", class: "w-full py-3 px-4 bg-gradient-to-r from-[#F5A08D] to-[#FFAA91] text-white font-semibold rounded-xl hover:shadow-lg transform hover:scale-[1.02] transition-all duration-200" %>
+          <%= f.submit "회원가입", 
+              data: { bridge__form_target: "submit" },
+              class: "w-full py-3 px-4 bg-gradient-to-r from-[#F5A08D] to-[#FFAA91] text-white font-semibold rounded-xl hover:shadow-lg transform hover:scale-[1.02] transition-all duration-200" %>
         </div>
       <% end %>
 

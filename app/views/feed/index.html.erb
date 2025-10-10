@@ -1,6 +1,47 @@
-<div class="min-h-screen bg-gradient-to-b from-[#FFF5E9] to-[#FDEBD0] flex items-center justify-center p-4">
-  <div class="text-center">
-    <h1 class="text-4xl font-bold text-gray-800">Home</h1>
-    <%= button_to "로그아웃", destroy_user_session_path, method: :delete, class: "mt-4 px-6 py-2 bg-[#F5A08D] text-white rounded-full hover:bg-[#FFAA91] transition-colors" %>
+<div class="min-h-screen bg-gradient-to-b from-[#FFF5E9] to-[#FDEBD0]">
+  <!-- 상단 헤더 -->
+  <div class="px-4 py-4 flex items-center justify-between"
+       data-controller="bridge--button bridge--menu"
+       data-bridge--button-title-value="메뉴"
+       data-bridge--button-style-value="plain"
+       data-bridge--button-position-value="right"
+       data-bridge--button-action="menu:display"
+       data-bridge--menu-title-value="설정"
+       data-bridge--menu-items-value='[{"index": 0, "title": "프로필", "url": "#"}, {"index": 1, "title": "로그아웃", "style": "destructive", "url": "<%= destroy_user_session_path %>", "method": "delete"}]'>
+    
+    <h1 class="text-2xl font-bold text-gray-800">Voice Talk</h1>
+    
+    <!-- 웹 브라우저용 메뉴 버튼 (네이티브 앱에서는 숨김) -->
+    <% unless turbo_native_app? %>
+      <button data-action="click->bridge--menu#display"
+              class="px-4 py-2 bg-white text-gray-700 rounded-xl shadow-sm hover:shadow-md transition-all">
+        메뉴
+      </button>
+    <% end %>
+  </div>
+
+  <!-- 메인 콘텐츠 -->
+  <div class="px-4 py-8 flex flex-col items-center justify-center min-h-[calc(100vh-80px)]">
+    <div class="text-center max-w-md">
+      <div class="inline-flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-br from-[#FDEBD0] to-[#FFF5E9] shadow-lg mb-6">
+        <svg class="w-14 h-14 text-[#F5A08D]" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+          <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+        </svg>
+      </div>
+      
+      <h2 class="text-3xl font-bold text-gray-800 mb-4">환영합니다!</h2>
+      <p class="text-gray-600 mb-8">음성 채팅을 시작할 준비가 되었습니다.</p>
+      
+      <!-- 빠른 액션 버튼들 -->
+      <div class="space-y-3">
+        <button class="w-full py-3 px-6 bg-gradient-to-r from-[#F5A08D] to-[#FFAA91] text-white font-semibold rounded-xl hover:shadow-lg transform hover:scale-[1.02] transition-all duration-200">
+          새 대화 시작
+        </button>
+        <button class="w-full py-3 px-6 bg-white text-gray-700 font-semibold rounded-xl border-2 border-gray-200 hover:border-[#F5A08D] hover:text-[#F5A08D] transition-all duration-200">
+          대화 목록
+        </button>
+      </div>
+    </div>
   </div>
 </div>
