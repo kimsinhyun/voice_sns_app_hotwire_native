@@ -1,5 +1,5 @@
-<div class="min-h-screen bg-gradient-to-b from-[#FFF5E9] to-[#FDEBD0]">
-  <!-- 상단 헤더 -->
+<div class="container bg-gradient-to-b from-[#FFF5E9] to-[#FDEBD0]">
+  <!-- 상단 헤더 (native navigation bar, 현재는 native 에서 hidden 처리되어 있음.) -->
   <div class="px-4 py-4 flex items-center justify-between"
        data-controller="bridge--button bridge--menu"
        data-bridge--button-title-value="메뉴"
@@ -8,8 +8,6 @@
        data-bridge--button-action="menu:display"
        data-bridge--menu-title-value="설정"
        data-bridge--menu-items-value='[{"index": 0, "title": "프로필", "url": "#"}, {"index": 1, "title": "로그아웃", "style": "destructive", "url": "<%= destroy_user_session_path %>", "method": "delete"}]'>
-    
-    <h1 class="text-2xl font-bold text-gray-800">Voice Talk</h1>
     
     <!-- 웹 브라우저용 메뉴 버튼 (네이티브 앱에서는 숨김) -->
     <% unless turbo_native_app? %>

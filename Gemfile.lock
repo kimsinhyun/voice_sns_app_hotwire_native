@@ -471,6 +471,7 @@ DEPENDENCIES
   thruster
   turbo-rails
   tzinfo-data
+  useragent (~> 0.16.7)
   web-console
 
 BUNDLED WITH
