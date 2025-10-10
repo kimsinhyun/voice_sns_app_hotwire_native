@@ -1,0 +1,31 @@
+{
+  "settings": {
+    "screenshots_enabled": true
+  },
+  "rules": [
+    {
+      "patterns": [
+        "/login$",
+        "/register$",
+        "/password/*"
+      ],
+      "properties": {
+        "context": "modal",
+        "pull_to_refresh_enabled": false,
+        "presentation": "default"
+      }
+    },
+    {
+      "patterns": [
+        "/feed$",
+        "/$"
+      ],
+      "properties": {
+        "context": "default",
+        "pull_to_refresh_enabled": true,
+        "presentation": "default"
+      }
+    }
+  ]
+}
+

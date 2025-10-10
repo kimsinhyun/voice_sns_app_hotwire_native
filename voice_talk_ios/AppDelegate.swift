@@ -6,15 +6,45 @@
 //
 
 import UIKit
+import HotwireNative
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
-
-
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+        // Path Configuration 로드
+        configurePathConfiguration()
+        
+        // Bridge Components 등록
+        configureBridgeComponents()
+        
+        // Debug 로깅 활성화 (개발 중)
+        Hotwire.config.debugLoggingEnabled = true
+        
         return true
+    }
+    
+    private func configurePathConfiguration() {
+        guard let pathConfigURL = Bundle.main.url(forResource: "path-configuration", withExtension: "json") else {
+            print("⚠️ path-configuration.json not found")
+            return
+        }
+        
+        Hotwire.loadPathConfiguration(from: [
+            .file(pathConfigURL)
+        ])
+        
+        print("✅ Path configuration loaded")
+    }
+    
+    private func configureBridgeComponents() {
+        Hotwire.registerBridgeComponents([
+            ButtonComponent.self,
+            FormComponent.self,
+            MenuComponent.self
+        ])
+        
+        print("✅ Bridge components registered")
     }
 
     // MARK: UISceneSession Lifecycle
