@@ -15,6 +15,12 @@ Rails.application.routes.draw do
                 sign_out: "logout",
                 sign_up: "register"
               }
+  
+  # Device-based authentication for native apps
+  devise_scope :user do
+    post "auth/device_login", to: "users/sessions#device_login"
+  end
+
   # Authenticated routes
   # authenticated :user do
   #   root "feed#index", as: :authenticated_root

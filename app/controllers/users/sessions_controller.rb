@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Users::SessionsController < Devise::SessionsController
+  skip_before_action :verify_authenticity_token, only: [:device_login]
+  
   # before_action :configure_sign_in_params, only: [:create]
 
   # GET /login
@@ -17,6 +19,26 @@ class Users::SessionsController < Devise::SessionsController
   # def destroy
   #   super
   # end
+
+  # POST /auth/device_login
+  # 기기 식별자로 자동 로그인
+  def device_login
+    device_id = params[:device_id]
+
+    if device_id.blank?
+      render json: { error: "device_id is required" }, status: :bad_request
+      return
+    end
+
+    # device_id로 사용자 찾기 또는 생성
+    user = User.find_or_create_by!(device_id: device_id)
+
+    # 자동 로그인
+    sign_in(user)
+
+    # Turbo Native 앱으로 리다이렉트
+    redirect_to feed_path, allow_other_host: false
+  end
 
   protected
 

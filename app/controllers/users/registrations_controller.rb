@@ -10,9 +10,17 @@ class Users::RegistrationsController < Devise::RegistrationsController
   # end
 
   # POST /register
-  # def create
-  #   super
-  # end
+  # Guest 사용자가 회원가입하면 기존 레코드를 업그레이드
+  def create
+    # 현재 로그인한 사용자가 guest인지 확인
+    if current_user&.guest?
+      # Guest 사용자를 정식 사용자로 업그레이드
+      upgrade_guest_to_registered
+    else
+      # 새로운 사용자 생성
+      super
+    end
+  end
 
   # GET /resource/edit
   # def edit
@@ -39,6 +47,30 @@ class Users::RegistrationsController < Devise::RegistrationsController
   # end
 
   protected
+
+  # Guest 사용자를 정식 사용자로 업그레이드
+  def upgrade_guest_to_registered
+    @user = current_user
+    
+    # 이메일과 비밀번호 업데이트
+    @user.email = sign_up_params[:email]
+    @user.password = sign_up_params[:password]
+    @user.password_confirmation = sign_up_params[:password_confirmation]
+    
+    # device_id는 유지 (이미 존재함)
+    
+    if @user.save
+      # 업그레이드 성공
+      bypass_sign_in(@user) # 세션 갱신
+      set_flash_message! :notice, :signed_up
+      respond_with @user, location: after_sign_up_path_for(@user)
+    else
+      # 업그레이드 실패
+      clean_up_passwords @user
+      set_minimum_password_length
+      respond_with @user
+    end
+  end
 
   # If you have extra params to permit, append them to the sanitizer.
   # def configure_sign_up_params
