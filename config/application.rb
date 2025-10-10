@@ -23,5 +23,8 @@ module VoiceTalk
     #
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
+
+    # Draper configuration
+    config.paths.add "app/decorators", eager_load: true
   end
 end
