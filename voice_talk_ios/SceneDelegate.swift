@@ -38,7 +38,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let webView = navigator.session.webView
         webView.configuration.allowsInlineMediaPlayback = true
         webView.configuration.mediaTypesRequiringUserActionForPlayback = []
-        webView.uiDelegate = self
         
         print("✅ WKWebView configured")
     }
@@ -72,95 +71,5 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                 print("✅ Device login 응답: \(httpResponse.statusCode)")
             }
         }.resume()
-    }
-}
-
-// MARK: - WKUIDelegate (미디어 권한 처리)
-
-extension SceneDelegate: WKUIDelegate {
-    // iOS 15+ 미디어 캡처 권한 처리
-    @available(iOS 15.0, *)
-    func webView(
-        _ webView: WKWebView,
-        requestMediaCapturePermissionFor origin: WKSecurityOrigin,
-        initiatedByFrame frame: WKFrameInfo,
-        type: WKMediaCaptureType,
-        decisionHandler: @escaping (WKPermissionDecision) -> Void
-    ) {
-        print("📱 Media capture permission requested for: \(origin.protocol)://\(origin.host)")
-        
-        // 마이크 권한인 경우
-        if type == .microphone {
-            // iOS 17 버전별 분기 처리 (타입이 다르므로 분리)
-            if #available(iOS 17.0, *) {
-                // iOS 17+: AVAudioApplication 사용
-                let permissionStatus = AVAudioApplication.shared.recordPermission
-                print("🎤 Current microphone permission status (iOS 17+): \(permissionStatus.rawValue)")
-                
-                switch permissionStatus {
-                case .granted:
-                    print("✅ Microphone permission already granted - auto approving")
-                    decisionHandler(.grant)
-                    
-                case .denied:
-                    print("❌ Microphone permission denied by user")
-                    decisionHandler(.deny)
-                    
-                case .undetermined:
-                    print("❓ Microphone permission undetermined - requesting...")
-                    AVAudioApplication.requestRecordPermission { granted in
-                        DispatchQueue.main.async {
-                            if granted {
-                                print("✅ Microphone permission granted by user")
-                                decisionHandler(.grant)
-                            } else {
-                                print("❌ Microphone permission denied by user")
-                                decisionHandler(.deny)
-                            }
-                        }
-                    }
-                    
-                @unknown default:
-                    print("⚠️ Unknown microphone permission status")
-                    decisionHandler(.deny)
-                }
-            } else {
-                // iOS 17 미만: AVAudioSession 사용
-                let permissionStatus = AVAudioSession.sharedInstance().recordPermission
-                print("🎤 Current microphone permission status: \(permissionStatus.rawValue)")
-                
-                switch permissionStatus {
-                case .granted:
-                    print("✅ Microphone permission already granted - auto approving")
-                    decisionHandler(.grant)
-                    
-                case .denied:
-                    print("❌ Microphone permission denied by user")
-                    decisionHandler(.deny)
-                    
-                case .undetermined:
-                    print("❓ Microphone permission undetermined - requesting...")
-                    AVAudioSession.sharedInstance().requestRecordPermission { granted in
-                        DispatchQueue.main.async {
-                            if granted {
-                                print("✅ Microphone permission granted by user")
-                                decisionHandler(.grant)
-                            } else {
-                                print("❌ Microphone permission denied by user")
-                                decisionHandler(.deny)
-                            }
-                        }
-                    }
-                    
-                @unknown default:
-                    print("⚠️ Unknown microphone permission status")
-                    decisionHandler(.deny)
-                }
-            }
-        } else {
-            // 기타 미디어 (카메라 등)는 승인
-            print("✅ Other media type approved: \(type)")
-            decisionHandler(.grant)
-        }
     }
 }
