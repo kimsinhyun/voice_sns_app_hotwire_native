@@ -41,10 +41,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         Hotwire.registerBridgeComponents([
             ButtonComponent.self,
             FormComponent.self,
-            MenuComponent.self
+            MenuComponent.self,
+            AudioRecorderComponent.self
         ])
         
-        print("✅ Bridge components registered")
+        print("✅ Bridge components registered (including AudioRecorder)")
     }
 
     // MARK: UISceneSession Lifecycle

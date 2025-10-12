@@ -25,6 +25,16 @@
         "pull_to_refresh_enabled": true,
         "presentation": "default"
       }
+    },
+    {
+      "patterns": [
+        "/recordings/new$"
+      ],
+      "properties": {
+        "context": "modal",
+        "pull_to_refresh_enabled": false,
+        "presentation": "default"
+      }
     }
   ]
 }
