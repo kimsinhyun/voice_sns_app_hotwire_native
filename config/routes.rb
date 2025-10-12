@@ -30,8 +30,11 @@ Rails.application.routes.draw do
   # Feed routes
   get "feed", to: "feed#index"
 
+  # Settings routes
+  get "settings", to: "settings#index"
+
   # Recordings routes
-  resources :recordings, only: [:new, :create]
+  resources :recordings, only: [:create]
 
   # Health check
   get "up" => "rails/health#show", as: :rails_health_check

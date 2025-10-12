@@ -96,22 +96,6 @@
     <% end %>
   </div>
 
-  <!-- 하단 고정 녹음 버튼 -->
-  <div class="fixed bottom-8 left-0 right-0 flex justify-center z-50 pb-safe">
-    <%= link_to new_recording_path, data: { turbo_frame: "_top" }, class: "group" do %>
-      <div class="relative">
-        <!-- 외곽 효과 -->
-        <div class="absolute inset-0 rounded-full bg-gradient-to-br from-red-400 to-red-600 opacity-20 blur-xl group-hover:opacity-40 transition-opacity"></div>
-        
-        <!-- 메인 버튼 -->
-        <button type="button" class="relative w-20 h-20 rounded-full bg-gradient-to-br from-red-500 to-red-600 shadow-2xl hover:shadow-red-500/50 transform hover:scale-110 active:scale-95 transition-all duration-200 flex items-center justify-center">
-          <!-- 마이크 아이콘 -->
-          <svg class="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
-            <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
-          </svg>
-        </button>
-      </div>
-    <% end %>
-  </div>
+  <!-- 컴팩트 녹음 툴바 -->
+  <%= render partial: 'shared/compact_recorder', locals: { submit_url: recordings_path } %>
 </div>

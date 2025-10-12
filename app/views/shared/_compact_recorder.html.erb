@@ -1,0 +1,66 @@
+<!-- 컴팩트 녹음 툴바 Partial -->
+<div data-controller="bridge--compact-audio-recorder"
+     data-bridge--compact-audio-recorder-submit-url-value="<%= submit_url %>"
+     data-bridge--compact-audio-recorder-max-duration-value="<%= defined?(max_duration) ? max_duration : 10 %>"
+     class="fixed bottom-0 left-0 right-0 pb-safe z-50 bg-gradient-to-r from-pink-300 via-pink-400 to-purple-400 shadow-lg">
+  
+  <div class="flex items-center justify-center gap-4 px-4 py-3">
+    <!-- 설정 버튼 -->
+    <%= link_to "/settings", data: { turbo_frame: "_top" }, class: "flex items-center justify-center w-10 h-10 text-white hover:text-gray-100 transition-colors" do %>
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+              d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+      </svg>
+    <% end %>
+    
+    <!-- 녹음 버튼 (진행도 포함) -->
+    <button type="button"
+            data-action="click->bridge--compact-audio-recorder#toggleRecording"
+            data-bridge--compact-audio-recorder-target="recordButton"
+            class="relative w-16 h-16 rounded-full border-4 border-white overflow-hidden shadow-lg transform hover:scale-105 active:scale-95 transition-transform">
+      <!-- 배경 (밝은 빨간색) -->
+      <div class="absolute inset-0 bg-red-500"></div>
+      
+      <!-- 진행도 fill (왼쪽→오른쪽, 어두운 빨간색) -->
+      <div data-bridge--compact-audio-recorder-target="recordProgress"
+           class="absolute inset-0 bg-red-700 transition-all duration-100"
+           style="clip-path: inset(0 100% 0 0);"></div>
+      
+      <!-- 마이크 아이콘 (상대 위치로 항상 위에 표시) -->
+      <svg class="absolute inset-0 m-auto w-8 h-8 text-white z-10" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+        <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+      </svg>
+    </button>
+    
+    <!-- 미리듣기 버튼 (조건부 표시) -->
+    <button type="button"
+            data-action="click->bridge--compact-audio-recorder#togglePlayback"
+            data-bridge--compact-audio-recorder-target="playbackButton"
+            class="hidden w-12 h-12 rounded-full bg-white bg-opacity-30 backdrop-blur-sm hover:bg-opacity-40 active:scale-95 transition-all flex items-center justify-center">
+      <!-- 재생 아이콘 -->
+      <svg data-bridge--compact-audio-recorder-target="playIcon"
+           class="w-6 h-6 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M8 5v14l11-7z"/>
+      </svg>
+      <!-- 중지 아이콘 -->
+      <svg data-bridge--compact-audio-recorder-target="stopIcon"
+           class="hidden w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+        <rect x="6" y="6" width="12" height="12" rx="2"/>
+      </svg>
+    </button>
+    
+    <!-- 제출 버튼 (조건부 표시) -->
+    <button type="button"
+            data-action="click->bridge--compact-audio-recorder#submit"
+            data-bridge--compact-audio-recorder-target="submitButton"
+            class="hidden w-12 h-12 rounded-full bg-white bg-opacity-30 backdrop-blur-sm hover:bg-opacity-40 active:scale-95 transition-all flex items-center justify-center">
+      <!-- 업로드 화살표 아이콘 -->
+      <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
+      </svg>
+    </button>
+  </div>
+</div>
+
