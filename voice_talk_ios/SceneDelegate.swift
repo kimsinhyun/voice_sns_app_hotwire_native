@@ -3,7 +3,8 @@ import UIKit
 import WebKit
 import AVFoundation
 
-let rootURL = URL(string: "http://localhost:3000")!
+//let rootURL = URL(string: "http://localhost:3000")!
+let rootURL = URL(string: "http://192.168.45.190:3000")!
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     var window: UIWindow?

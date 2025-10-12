@@ -28,10 +28,10 @@
     },
     {
       "patterns": [
-        "/recordings/new$"
+        "/settings$"
       ],
       "properties": {
-        "context": "modal",
+        "context": "default",
         "pull_to_refresh_enabled": false,
         "presentation": "default"
       }

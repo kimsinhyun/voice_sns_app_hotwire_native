@@ -31,6 +31,8 @@ final class AudioRecorderComponent: BridgeComponent {
             handlePlayAudio(message: message)
         case .pauseAudio:
             handlePauseAudio(message: message)
+        case .stopAudio:
+            handleStopAudio(message: message)
         case .getAudioData:
             handleGetAudioData(message: message)
         }
@@ -281,6 +283,17 @@ final class AudioRecorderComponent: BridgeComponent {
         reply(to: "pauseAudio")
     }
     
+    // MARK: - 미리듣기 중지 (처음부터 재생용)
+    
+    private func handleStopAudio(message: Message) {
+        audioPlayer?.stop()
+        audioPlayer?.currentTime = 0  // 재생 위치를 처음으로 되돌림
+        playbackTimer?.invalidate()
+        playbackTimer = nil
+        print("⏹️ Audio stopped and reset to beginning")
+        reply(to: "stopAudio")
+    }
+    
     // MARK: - 오디오 데이터 가져오기 (Base64)
     
     private func handleGetAudioData(message: Message) {
@@ -315,6 +328,7 @@ final class AudioRecorderComponent: BridgeComponent {
         case stopRecording
         case playAudio
         case pauseAudio
+        case stopAudio
         case getAudioData
     }
 }
