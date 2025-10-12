@@ -1,7 +1,7 @@
 class ApplicationController < ActionController::Base
   include ErrorHandler
   # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
-  allow_browser versions: :modern
+  # allow_browser versions: :modern
 
   # Turbo Native 앱에서 오는 요청인지 확인
   def turbo_native_app?

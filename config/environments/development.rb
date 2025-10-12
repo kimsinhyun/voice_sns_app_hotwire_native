@@ -73,4 +73,6 @@ Rails.application.configure do
   # Allow ngrok hosts for development
   config.hosts << /[a-z0-9\-]+\.ngrok-free\.app/
   config.hosts << /[a-z0-9\-]+\.ngrok\.io/
+  # Android emulator host address
+  config.hosts << "10.0.2.2"
 end
