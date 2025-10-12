@@ -4,6 +4,8 @@ class User < ApplicationRecord
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable, :confirmable, :lockable
 
+  has_many :recordings, dependent: :destroy
+
   # Guest 사용자는 device_id만 있고 이메일이 없음
   validates :device_id, uniqueness: true, allow_nil: true
   validates :email, presence: true, if: :email_required?
