@@ -18,7 +18,8 @@ class MainActivity : HotwireActivity() {
     override fun navigatorConfigurations() = listOf(
         NavigatorConfiguration(
             name = "main",
-            startLocation = "https://hotwire-native-demo.dev",
+//            startLocation = "https://hotwire-native-demo.dev",
+            startLocation = "http://10.0.2.2:3000",
             navigatorHostId = R.id.main_nav_host
         )
     )
