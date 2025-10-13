@@ -208,23 +208,23 @@ export default class extends BridgeComponent {
   
   showPlaybackControls() {
     if (this.hasPlaybackButtonTarget) {
-      this.playbackButtonTarget.classList.remove("hidden")
-      this.playbackButtonTarget.classList.add("flex")
+      this.playbackButtonTarget.classList.remove("invisible")
+      this.playbackButtonTarget.classList.add("visible")
     }
     if (this.hasSubmitButtonTarget) {
-      this.submitButtonTarget.classList.remove("hidden")
-      this.submitButtonTarget.classList.add("flex")
+      this.submitButtonTarget.classList.remove("invisible")
+      this.submitButtonTarget.classList.add("visible")
     }
   }
   
   hidePlaybackControls() {
     if (this.hasPlaybackButtonTarget) {
-      this.playbackButtonTarget.classList.add("hidden")
-      this.playbackButtonTarget.classList.remove("flex")
+      this.playbackButtonTarget.classList.add("invisible")
+      this.playbackButtonTarget.classList.remove("visible")
     }
     if (this.hasSubmitButtonTarget) {
-      this.submitButtonTarget.classList.add("hidden")
-      this.submitButtonTarget.classList.remove("flex")
+      this.submitButtonTarget.classList.add("invisible")
+      this.submitButtonTarget.classList.remove("visible")
     }
     
     // 재생 상태 초기화
