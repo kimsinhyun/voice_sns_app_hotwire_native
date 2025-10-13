@@ -27,6 +27,7 @@ class MainActivity : HotwireActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        supportActionBar?.hide()
         setContentView(R.layout.activity_main)
         findViewById<View>(R.id.main_nav_host).applyDefaultImeWindowInsets()
         
@@ -38,7 +39,7 @@ class MainActivity : HotwireActivity() {
         NavigatorConfiguration(
             name = "main",
 //            startLocation = "https://hotwire-native-demo.dev",
-            startLocation = "http://10.0.2.2:3000",
+            startLocation = "http://10.0.2.2:3000/feed",
             navigatorHostId = R.id.main_nav_host
         )
     )

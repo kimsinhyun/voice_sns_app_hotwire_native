@@ -1,18 +1,17 @@
 {
   "settings": {
-    "screenshots_enabled": true
+    "screenshots_enabled": true,
+    "toolbar_visible": true
   },
   "rules": [
     {
       "patterns": [
-        "/login$",
-        "/register$",
-        "/password/.*"
+        ".*"
       ],
       "properties": {
-        "context": "modal",
-        "uri": "hotwire://fragment/web/modal/sheet",
-        "pull_to_refresh_enabled": false
+        "context": "default",
+        "uri": "hotwire://fragment/web",
+        "pull_to_refresh_enabled": true
       }
     },
     {
@@ -22,8 +21,9 @@
       ],
       "properties": {
         "context": "default",
-        "uri": "hotwire://fragment/web",
-        "pull_to_refresh_enabled": true
+        "uri": "hotwire://fragment/web/without-toolbar",
+        "pull_to_refresh_enabled": true,
+        "toolbar_visible": false
       }
     },
     {
@@ -33,17 +33,8 @@
       "properties": {
         "context": "default",
         "uri": "hotwire://fragment/web",
-        "pull_to_refresh_enabled": false
-      }
-    },
-    {
-      "patterns": [
-        ".*"
-      ],
-      "properties": {
-        "context": "default",
-        "uri": "hotwire://fragment/web",
-        "pull_to_refresh_enabled": true
+        "pull_to_refresh_enabled": false,
+        "toolbar_visible": true
       }
     }
   ]
