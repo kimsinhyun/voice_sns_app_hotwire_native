@@ -2,12 +2,55 @@
 @tailwind components;
 @tailwind utilities;
 
-/*
+@layer base {
+  html {
+    height: -webkit-fill-available;
+  }
 
-@layer components {
-  .btn-primary {
-    @apply py-2 px-4 bg-blue-200;
+  body {
+    height: -webkit-fill-available;
+  }
+
+  #root {
+    height: -webkit-fill-available;
   }
 }
 
-*/
+@layer utilities {
+  /* Safe Area Inset 유틸리티 */
+  .pt-safe {
+    padding-top: env(safe-area-inset-top);
+  }
+  
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  .pl-safe {
+    padding-left: env(safe-area-inset-left);
+  }
+  
+  .pr-safe {
+    padding-right: env(safe-area-inset-right);
+  }
+  
+  .px-safe {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+  
+  .py-safe {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  /* Safe Area와 기본 패딩 조합 */
+  .pb-safe-or-4 {
+    padding-bottom: max(env(safe-area-inset-bottom), 1rem);
+  }
+  
+  .pt-safe-or-4 {
+    padding-top: max(env(safe-area-inset-top), 1rem);
+  }
+}
+

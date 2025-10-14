@@ -2,7 +2,7 @@
 <html>
 <head>
 	<title><%= content_for(:title) %></title>
-	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 	<meta name="apple-mobile-web-app-capable" content="yes">
 	<meta name="mobile-web-app-capable" content="yes">
 	<%= csrf_meta_tags %>
@@ -24,9 +24,12 @@
 	<%= javascript_importmap_tags %>
 </head>
 
-	<body class="bg-[#FDEBD0]">
-		<main>
+	<body class="bg-[#FDEBD0] flex flex-col h-screen">
+		<main class="flex-1 overflow-y-auto">
 			<%= yield %>
 		</main>
+		<div>
+			<%= render "shared/footer", submit_url: @submit_url  if @submit_url %>
+		</div>
 	</body>
 </html>

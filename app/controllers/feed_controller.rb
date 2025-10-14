@@ -3,5 +3,6 @@ class FeedController < ApplicationController
 
   def index
     @recordings = Recording.all.order(created_at: :desc)
+    @submit_url = recordings_path
   end
 end

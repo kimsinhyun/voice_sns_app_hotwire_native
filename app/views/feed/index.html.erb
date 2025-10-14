@@ -1,7 +1,6 @@
 <div class="container">
-  <!-- 메인 콘텐츠 -->
-<!--  <div class="px-4 py-4 pb-32 min-h-[calc(100vh-80px)]">-->
-  <div class="px-4 py-4">
+  <!-- 메인 콘텐츠 - 상단 safe area, 하단 recorder 높이만큼 패딩 (탭은 safe-area로 처리) -->
+  <div class="px-4 py-4 pt-safe-or-4 pb-[88px]">
     <% if @recordings&.any? %>
       <!-- 녹음 목록 -->
       <div class="space-y-3">
@@ -11,7 +10,7 @@
   </div>
 </div>
 
-<!-- 컴팩트 녹음 툴바 -->
-<div>
-  <%= render partial: 'shared/compact_recorder', locals: { submit_url: recordings_path } %>
-</div>
+<!-- 컴팩트 녹음 툴바 - 화면 하단에 고정, safe-area로 탭 위에 자동 배치 -->
+<!--<div class="fixed bottom-0 left-0 right-0 pb-safe z-50">-->
+  <%#= render partial: 'shared/compact_recorder', locals: { submit_url: recordings_path } %>
+<!--</div>-->
