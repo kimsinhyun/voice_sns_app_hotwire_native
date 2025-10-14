@@ -4,7 +4,8 @@ import WebKit
 import AVFoundation
 
 //let rootURL = URL(string: "http://localhost:3000")!
-let rootURL = URL(string: "http://192.168.45.190:3000")!
+let rootURL = URL(string: "http://192.168.1.69:3000")!
+
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     var window: UIWindow?
@@ -20,7 +21,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         window?.rootViewController = navigator.rootViewController
         
-        self.navigator.rootViewController.setNavigationBarHidden(true, animated: false)
+        // self.navigator.rootViewController.setNavigationBarHidden(true, animated: false)
         
         // WKWebView 설정을 여기서 수행 (뷰가 로드된 후)
         DispatchQueue.main.async {
@@ -39,6 +40,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let webView = navigator.session.webView
         webView.configuration.allowsInlineMediaPlayback = true
         webView.configuration.mediaTypesRequiringUserActionForPlayback = []
+        webView.allowsLinkPreview = false  // Link Preview 비활성화 (네이티브 앱 느낌 강화)
         
         print("✅ WKWebView configured")
     }

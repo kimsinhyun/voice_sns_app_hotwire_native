@@ -5,6 +5,14 @@
   "rules": [
     {
       "patterns": [
+        "refresh_historical_location"
+      ],
+      "properties": {
+        "presentation": "refresh"
+      }
+    },
+    {
+      "patterns": [
         "/login$",
         "/register$",
         "/password/*"
@@ -34,6 +42,14 @@
         "context": "default",
         "pull_to_refresh_enabled": false,
         "presentation": "default"
+      }
+    },
+    {
+      "patterns": [
+        "/logout$"
+      ],
+      "properties": {
+        "presentation": "clear_all"
       }
     }
   ]
