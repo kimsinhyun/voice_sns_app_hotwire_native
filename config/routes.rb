@@ -10,12 +10,12 @@ Rails.application.routes.draw do
                confirmations: "users/confirmations"
              },
              path: "",
-              path_names: {
-                sign_in: "login",
-                sign_out: "logout",
-                sign_up: "register"
-              }
-  
+             path_names: {
+               sign_in: "login",
+               sign_out: "logout",
+               sign_up: "register"
+             }
+
   # Device-based authentication for native apps
   devise_scope :user do
     post "auth/device_login", to: "users/sessions#device_login"
@@ -28,13 +28,13 @@ Rails.application.routes.draw do
   root to: "feed#index"
 
   # Feed routes
-  get "feed", to: "feed#index"
-
-  # Settings routes
-  get "settings", to: "settings#index"
+  # get "feed", to: "feed#index"
+  resources :feed, only: [ :index ]
+  resources :messages, only: [ :index ]
+  resources :settings, only: [ :index ]
 
   # Recordings routes
-  resources :recordings, only: [:create]
+  resources :recordings, only: [ :create ]
 
   # Health check
   get "up" => "rails/health#show", as: :rails_health_check

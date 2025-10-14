@@ -34,15 +34,13 @@
 
     /* Safe Area 지원 (노치/Dynamic Island 대응) */
     body {
-        padding-top: env(safe-area-inset-top);
-        padding-bottom: env(safe-area-inset-bottom);
-        padding-left: env(safe-area-inset-left);
-        padding-right: env(safe-area-inset-right);
-    }
+        padding-top: var(--safe-area-inset-top, 0);
+        padding-bottom: var(--safe-area-inset-bottom, 0);
+        padding-left: var(--safe-area-inset-left, 0);
+        padding-right: var(--safe-area-inset-right, 0);
 
-    /* 터치 액션 최적화 */
-    body {
         touch-action: pan-x pan-y;
+        height: --webkit-fill-available;
     }
 }
 
