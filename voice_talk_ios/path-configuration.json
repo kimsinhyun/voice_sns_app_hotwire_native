@@ -20,7 +20,6 @@
       "properties": {
         "context": "modal",
         "pull_to_refresh_enabled": false,
-        "presentation": "default"
       }
     },
     {
@@ -29,9 +28,16 @@
         "/$"
       ],
       "properties": {
+        "pull_to_refresh_enabled": true
+      }
+    },
+    {
+      "patterns": [
+        "/messages$"
+      ],
+      "properties": {
         "context": "default",
-        "pull_to_refresh_enabled": true,
-        "presentation": "default"
+        "pull_to_refresh_enabled": false
       }
     },
     {
@@ -40,8 +46,7 @@
       ],
       "properties": {
         "context": "default",
-        "pull_to_refresh_enabled": false,
-        "presentation": "default"
+        "pull_to_refresh_enabled": false
       }
     },
     {

@@ -3,53 +3,27 @@ import UIKit
 import HotwireNative
 
 extension HotwireTab {
-    static let all: [HotwireTab] = {
-        var tabs: [HotwireTab] = [
-            .navigation,
-            .bridgeComponents,
-            .resources
-        ]
+    static let all: [HotwireTab] = [
+        .feed,
+        .messages,
+        .settings
+    ]
 
-        if Main.current == Main.local {
-            tabs.append(.bugsAndFixes)
-        }
-
-        return tabs
-    }()
-
-    static let navigation = HotwireTab(
-        title: "Navigation",
-        image: .init(systemName: "arrow.left.arrow.right")!,
-        url: Main.current
+    static let feed = HotwireTab(
+        title: "",
+        image: UIImage(systemName: "house.fill")!,
+        url: Main.current.appendingPathComponent("feed")
     )
 
-    static let bridgeComponents = HotwireTab(
-        title: "Bridge Components",
-        image: {
-            if #available(iOS 17.4, *) {
-                return UIImage(systemName: "widget.small")!
-            } else {
-                return UIImage(systemName: "square.grid.2x2")!
-            }
-        }(),
-        url: Main.current.appendingPathComponent("components")
+    static let messages = HotwireTab(
+        title: "",
+        image: UIImage(systemName: "message.fill")!,
+        url: Main.current.appendingPathComponent("messages")
     )
 
-    static let resources = HotwireTab(
-        title: "Resources",
-        image: {
-            if #available(iOS 17.4, *) {
-                return UIImage(systemName: "questionmark.text.page")!
-            } else {
-                return UIImage(systemName: "book.closed")!
-            }
-        }(),
-        url: Main.current.appendingPathComponent("resources")
-    )
-
-    static let bugsAndFixes = HotwireTab(
-        title: "Bugs & Fixes",
-        image: .init(systemName: "ladybug")!,
-        url: Main.current.appendingPathComponent("bugs")
+    static let settings = HotwireTab(
+        title: "",
+        image: UIImage(systemName: "gearshape.fill")!,
+        url: Main.current.appendingPathComponent("settings")
     )
 }

@@ -44,6 +44,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             FormComponent.self,
             MenuComponent.self,
             AudioRecorderComponent.self,
+            NavigationBarComponent.self,
         ])
 
         // Set configuration options

@@ -4,10 +4,11 @@ import WebKit
 import AVFoundation
 
 //let rootURL = URL(string: "http://localhost:3000")!
-let rootURL = URL(string: "http://192.168.1.69:3000")!
 
 final class SceneController: UIResponder {
     var window: UIWindow?
+    
+    private let rootURL = Main.current
     
     private lazy var tabBarController = HotwireTabBarController(navigatorDelegate: self)
 }
