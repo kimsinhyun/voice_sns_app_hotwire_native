@@ -33,10 +33,14 @@
         </div>
 
         <% if devise_mapping.rememberable? %>
-          <div class="flex items-center">
-            <%= f.check_box :remember_me, class: "w-4 h-4 text-[#F5A08D] border-gray-300 rounded focus:ring-[#F5A08D]" %>
-            <%= f.label :remember_me, "로그인 상태 유지", class: "ml-2 text-sm text-gray-600" %>
-          </div>
+          <% if hotwire_native_app? %>
+            <%= f.hidden_field :remember_me, value: true %>
+          <% else %>
+            <div class="flex items-center">
+              <%= f.check_box :remember_me, class: "w-4 h-4 text-[#F5A08D] border-gray-300 rounded focus:ring-[#F5A08D]" %>
+              <%= f.label :remember_me, "로그인 상태 유지", class: "ml-2 text-sm text-gray-600" %>
+            </div>
+          <% end %>
         <% end %>
 
         <div>

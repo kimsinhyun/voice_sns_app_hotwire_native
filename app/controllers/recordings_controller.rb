@@ -18,7 +18,7 @@ class RecordingsController < ApplicationController
     
     if @recording.save
       respond_to do |format|
-        format.html { redirect_to feed_path, notice: "녹음이 저장되었습니다." }
+        format.html { refresh_or_redirect_to feed_path, notice: "녹음이 저장되었습니다." }
         format.json { render json: { success: true, recording: @recording }, status: :created }
       end
     else

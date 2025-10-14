@@ -53,4 +53,17 @@
         overscroll-behavior: none;
         -webkit-overflow-scrolling: touch;
     }
+
+    /* Hotwire Native 앱에서 요소 숨기기/표시 */
+    .d-hotwire-native-none {
+        display: none !important;
+    }
+
+    .d-hotwire-native-block {
+        display: block !important;
+    }
+
+    .d-hotwire-native-flex {
+        display: flex !important;
+    }
 }
