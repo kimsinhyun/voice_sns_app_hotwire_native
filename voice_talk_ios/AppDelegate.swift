@@ -5,63 +5,53 @@
 //  Created by kimsinhyun on 10/10/25.
 //
 
-import UIKit
 import HotwireNative
+import UIKit
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
-
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Path Configuration 로드
-        configurePathConfiguration()
-        
-        // Bridge Components 등록
-        configureBridgeComponents()
-        
-        // Debug 로깅 활성화 (개발 중)
-        Hotwire.config.debugLoggingEnabled = true
+        configureAppearance()
+        configureHotwire()
         
         return true
     }
     
-    private func configurePathConfiguration() {
-        guard let pathConfigURL = Bundle.main.url(forResource: "path-configuration", withExtension: "json") else {
-            print("⚠️ path-configuration.json not found")
-            return
-        }
-        
-        Hotwire.loadPathConfiguration(from: [
-            .file(pathConfigURL)
-        ])
-        
-        print("✅ Path configuration loaded")
+    // MARK: UISceneSession Lifecycle
+    func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
+        UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
     }
     
-    private func configureBridgeComponents() {
+    // Make navigation and tab bars opaque.
+    private func configureAppearance() {
+        UINavigationBar.appearance().scrollEdgeAppearance = .init()
+        UITabBar.appearance().scrollEdgeAppearance = .init()
+    }
+
+
+    
+    private func configureHotwire() {
+        // Load the path configuration
+        Hotwire.loadPathConfiguration(from: [
+            .file(Bundle.main.url(forResource: "path-configuration", withExtension: "json")!)
+        ])
+
+        // Set an optional custom user agent application prefix.
+        Hotwire.config.applicationUserAgentPrefix = "VoiceTalk Turbo Native;"
+
+        // Register bridge components
         Hotwire.registerBridgeComponents([
-            ButtonComponent.self,
             FormComponent.self,
             MenuComponent.self,
-            AudioRecorderComponent.self
+            AudioRecorderComponent.self,
         ])
-        
-        print("✅ Bridge components registered (including AudioRecorder)")
+
+        // Set configuration options
+        Hotwire.config.backButtonDisplayMode = .minimal
+        Hotwire.config.showDoneButtonOnModals = true
+#if DEBUG
+        Hotwire.config.debugLoggingEnabled = true
+#endif
     }
-
-    // MARK: UISceneSession Lifecycle
-
-    func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
-        // Called when a new scene session is being created.
-        // Use this method to select a configuration to create the new scene with.
-        return UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
-    }
-
-    func application(_ application: UIApplication, didDiscardSceneSessions sceneSessions: Set<UISceneSession>) {
-        // Called when the user discards a scene session.
-        // If any sessions were discarded while the application was not running, this will be called shortly after application:didFinishLaunchingWithOptions.
-        // Use this method to release any resources that were specific to the discarded scenes, as they will not return.
-    }
-
-
 }
 
