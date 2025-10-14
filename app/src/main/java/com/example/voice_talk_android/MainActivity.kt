@@ -7,6 +7,7 @@ import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import dev.hotwire.core.turbo.config.Hotwire
 import dev.hotwire.navigation.activities.HotwireActivity
 import dev.hotwire.navigation.navigator.NavigatorConfiguration
 import dev.hotwire.navigation.util.applyDefaultImeWindowInsets
@@ -30,6 +31,12 @@ class MainActivity : HotwireActivity() {
         supportActionBar?.hide()
         setContentView(R.layout.activity_main)
         findViewById<View>(R.id.main_nav_host).applyDefaultImeWindowInsets()
+        
+        // RouteDecisionHandler 등록 (외부 URL 처리)
+        Hotwire.registerRouteDecisionHandlers(
+            AppNavigationRouteDecisionHandler(),
+            BrowserTabRouteDecisionHandler()
+        )
         
         // 마이크 권한 요청 (Android 6.0+)
         requestMicrophonePermission()
