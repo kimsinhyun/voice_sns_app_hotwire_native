@@ -4,10 +4,10 @@ class ApplicationController < ActionController::Base
   # allow_browser versions: :modern
 
   # Turbo Native 앱에서 오는 요청인지 확인
-  def turbo_native_app?
+  def hotwire_native_app?
     request.user_agent.to_s.match?(/Turbo Native/)
   end
-  helper_method :turbo_native_app?
+  helper_method :hotwire_native_app?
 
   # Redirect after sign in
   def after_sign_in_path_for(resource)

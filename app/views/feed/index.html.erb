@@ -10,7 +10,7 @@
 <!--       data-bridge--menu-items-value='[{"index": 0, "title": "프로필", "url": "#"}, {"index": 1, "title": "로그아웃", "style": "destructive", "url": "<%#= destroy_user_session_path %>", "method": "delete"}]'>-->
     
     <!-- 웹 브라우저용 메뉴 버튼 (네이티브 앱에서는 숨김) -->
-    <%# unless turbo_native_app? %>
+    <%# unless hotwire_native_app? %>
 <!--      <button data-action="click->bridge--menu#display"-->
 <!--              class="px-4 py-2 bg-white text-gray-700 rounded-xl shadow-sm hover:shadow-md transition-all">-->
 <!--        메뉴-->

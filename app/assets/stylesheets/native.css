@@ -1,0 +1,56 @@
+@layer base {
+    /* 스크롤바 완전히 숨기기 (Webkit) */
+    *::-webkit-scrollbar {
+        display: none;
+        width: 0;
+        height: 0;
+    }
+
+    /* 스크롤바 숨기기 (표준) */
+    * {
+        -ms-overflow-style: none;  /* IE and Edge */
+        scrollbar-width: none;  /* Firefox */
+    }
+
+    /* 바운스 효과 제거는 .no-bounce 클래스로 선택적 적용 */
+
+    /* 텍스트 선택 제한 (버튼, 네비게이션 등) */
+    button, a, [role="button"] {
+        -webkit-user-select: none;
+        user-select: none;
+    }
+
+    /* 탭 하이라이트 제거 (터치 시 파란색 효과) */
+    * {
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+    }
+
+    /* 텍스트 입력 요소는 선택 가능하도록 */
+    input, textarea, [contenteditable="true"] {
+        -webkit-user-select: text;
+        user-select: text;
+    }
+
+    /* Safe Area 지원 (노치/Dynamic Island 대응) */
+    body {
+        padding-top: env(safe-area-inset-top);
+        padding-bottom: env(safe-area-inset-bottom);
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
+    }
+
+    /* 터치 액션 최적화 */
+    body {
+        touch-action: pan-x pan-y;
+    }
+}
+
+@layer utilities {
+    /* 바운스 효과 제거 클래스 (특정 페이지에만 적용) */
+    .no-bounce,
+    .no-bounce * {
+        overscroll-behavior: none;
+        -webkit-overflow-scrolling: touch;
+    }
+}

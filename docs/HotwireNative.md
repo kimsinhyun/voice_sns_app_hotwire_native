@@ -144,10 +144,10 @@ extension SceneDelegate: NavigatorDelegate {
 ```ruby
 # app/controllers/application_controller.rb
 class ApplicationController < ActionController::Base
-  def turbo_native_app?
+  def hotwire_native_app?
     request.user_agent.to_s.match?(/Turbo Native/)
   end
-  helper_method :turbo_native_app?
+  helper_method :hotwire_native_app?
 end
 ```
 
@@ -349,7 +349,7 @@ Xcode에서 `path-configuration.json`의 Target Membership 확인
 웹 브라우저 접근을 구분하고 싶다면:
 
 ```ruby
-def turbo_native_app?
+def hotwire_native_app?
   request.user_agent.to_s.match?(/Turbo Native/)
 end
 ```
