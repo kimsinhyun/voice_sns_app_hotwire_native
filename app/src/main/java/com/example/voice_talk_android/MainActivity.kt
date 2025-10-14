@@ -1,4 +1,4 @@
-package com.example.voice_talk_android // update to match your project
+package com.example.voice_talk_android
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -6,13 +6,19 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
-import dev.hotwire.core.turbo.config.Hotwire
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import dev.hotwire.core.config.Hotwire
 import dev.hotwire.navigation.activities.HotwireActivity
-import dev.hotwire.navigation.navigator.NavigatorConfiguration
+import dev.hotwire.navigation.tabs.HotwireBottomNavigationController
+import dev.hotwire.navigation.tabs.navigatorConfigurations
 import dev.hotwire.navigation.util.applyDefaultImeWindowInsets
 
 class MainActivity : HotwireActivity() {
+    
+    private lateinit var bottomNavigationController: HotwireBottomNavigationController
+    private val viewModel: MainActivityViewModel by viewModels()
     
     // 권한 요청 런처
     private val requestPermissionLauncher = registerForActivityResult(
@@ -30,26 +36,27 @@ class MainActivity : HotwireActivity() {
         super.onCreate(savedInstanceState)
         supportActionBar?.hide()
         setContentView(R.layout.activity_main)
-        findViewById<View>(R.id.main_nav_host).applyDefaultImeWindowInsets()
+        findViewById<View>(R.id.root).applyDefaultImeWindowInsets()
         
-        // RouteDecisionHandler 등록 (외부 URL 처리)
-        Hotwire.registerRouteDecisionHandlers(
-            AppNavigationRouteDecisionHandler(),
-            BrowserTabRouteDecisionHandler()
-        )
+
+        // Bottom Tabs 초기화
+        initializeBottomTabs()
         
         // 마이크 권한 요청 (Android 6.0+)
         requestMicrophonePermission()
     }
 
-    override fun navigatorConfigurations() = listOf(
-        NavigatorConfiguration(
-            name = "main",
-//            startLocation = "https://hotwire-native-demo.dev",
-            startLocation = "http://10.0.2.2:3000/feed",
-            navigatorHostId = R.id.main_nav_host
-        )
-    )
+    private fun initializeBottomTabs() {
+        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_nav)
+
+        bottomNavigationController = HotwireBottomNavigationController(this, bottomNavigationView)
+        bottomNavigationController.load(mainTabs, viewModel.selectedTabIndex)
+        bottomNavigationController.setOnTabSelectedListener { index, _ ->
+            viewModel.selectedTabIndex = index
+        }
+    }
+
+    override fun navigatorConfigurations() = mainTabs.navigatorConfigurations
     
     private fun requestMicrophonePermission() {
         when {

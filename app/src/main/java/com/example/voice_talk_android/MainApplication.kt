@@ -1,7 +1,6 @@
 package com.example.voice_talk_android
 
 import android.app.Application
-import android.os.Build
 import com.example.voice_talk_android.bridge.AudioRecorderComponent
 import com.example.voice_talk_android.fragments.WebBottomSheetFragment
 import com.example.voice_talk_android.fragments.WebFragment
@@ -24,7 +23,8 @@ class MainApplication : Application() {
         Hotwire.loadPathConfiguration(
             context = this,
             location = PathConfiguration.Location(
-                assetFilePath = "json/configuration.json"
+                assetFilePath = "json/path-configuration.json",
+                remoteFileUrl = "${Main.current.url}/configurations/android_v1.json"
             )
         )
 

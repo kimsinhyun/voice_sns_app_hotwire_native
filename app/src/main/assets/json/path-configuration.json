@@ -1,8 +1,5 @@
 {
-  "settings": {
-    "screenshots_enabled": true,
-    "toolbar_visible": true
-  },
+  "settings": {},
   "rules": [
     {
       "patterns": [
@@ -11,7 +8,29 @@
       "properties": {
         "context": "default",
         "uri": "hotwire://fragment/web",
+        "fallback_uri": "hotwire://fragment/web",
         "pull_to_refresh_enabled": true
+      }
+    },
+    {
+      "patterns": [
+        "^$",
+        "^/$"
+      ],
+      "properties": {
+        "presentation": "clear_all",
+        "comment": "Clear navigation stack when visiting root page."
+      }
+    },
+    {
+      "patterns": [
+        "/new$",
+        "/edit$",
+        "/modal"
+      ],
+      "properties": {
+        "context": "modal",
+        "pull_to_refresh_enabled": false
       }
     },
     {
@@ -22,8 +41,7 @@
       "properties": {
         "context": "default",
         "uri": "hotwire://fragment/web/without-toolbar",
-        "pull_to_refresh_enabled": true,
-        "toolbar_visible": false
+        "pull_to_refresh_enabled": true
       }
     },
     {
@@ -33,8 +51,7 @@
       "properties": {
         "context": "default",
         "uri": "hotwire://fragment/web",
-        "pull_to_refresh_enabled": false,
-        "toolbar_visible": true
+        "pull_to_refresh_enabled": false
       }
     }
   ]
