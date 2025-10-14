@@ -2,6 +2,7 @@ package com.example.voice_talk_android
 
 import android.app.Application
 import com.example.voice_talk_android.bridge.AudioRecorderComponent
+import com.example.voice_talk_android.bridge.NavigationBarComponent
 import com.example.voice_talk_android.fragments.WebBottomSheetFragment
 import com.example.voice_talk_android.fragments.WebFragment
 import com.example.voice_talk_android.fragments.WebFragmentWithoutToolbar
@@ -41,10 +42,13 @@ class MainApplication : Application() {
         // Register bridge components
         Hotwire.registerBridgeComponents(*Bridgework.coreComponents)
 
-        // 커스텀 AudioRecorderComponent 추가 등록
+        // 커스텀 Bridge Components 등록
+        android.util.Log.d("MainApplication", "🔵 Registering Bridge Components...")
         Hotwire.registerBridgeComponents(
-            BridgeComponentFactory("audio-recorder", ::AudioRecorderComponent)
+            BridgeComponentFactory("audio-recorder", ::AudioRecorderComponent),
+            BridgeComponentFactory("navigation-bar", ::NavigationBarComponent)
         )
+        android.util.Log.d("MainApplication", "✅ Bridge Components registered: audio-recorder, navigation-bar")
 
         // Set Configuration options
         Hotwire.config.debugLoggingEnabled = BuildConfig.DEBUG
