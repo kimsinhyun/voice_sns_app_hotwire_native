@@ -1,4 +1,9 @@
-<div class="container">
+<!-- Navigation bar를 숨기는 Bridge Component -->
+<div data-controller="bridge--navigation-bar" 
+     data-bridge--navigation-bar-hidden-value="true"
+		 class="hidden"></div>
+
+<div class="container overflow-y-auto">
   <!-- 메인 콘텐츠 - 상단 safe area, 하단 recorder 높이만큼 패딩 (탭은 safe-area로 처리) -->
   <div class="px-4 py-4 pt-safe-or-4 pb-[88px]">
     <% if @recordings&.any? %>
