@@ -24,11 +24,11 @@
 	<%= javascript_importmap_tags %>
 </head>
 
-	<body class="bg-[#FDEBD0] flex flex-col h-dvh">
+	<body class="bg-[#d6d5cc] flex flex-col h-dvh scratch-bg">
 		<main class="flex-1 overflow-y-auto pt-4">
 			<%= yield %>
 		</main>
-		<div>
+		<div class="pd-safe">
 			<%= render "shared/footer", submit_url: @submit_url  if @submit_url %>
 		</div>
 	</body>

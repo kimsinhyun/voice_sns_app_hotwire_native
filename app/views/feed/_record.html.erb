@@ -1,4 +1,11 @@
-<div class="bg-white rounded-lg shadow-sm p-4 mb-3" 
+<% 
+  # 각 카드마다 다른 텍스처 위치를 위한 랜덤 offset (recording.id 기반으로 일관성 유지)
+  random_seed = recording.id || rand(1000)
+  offset_x = (random_seed * 37) % 100  # 0-100% 사이
+  offset_y = (random_seed * 73) % 100  # 0-100% 사이
+%>
+<div class="bg-white/70 backdrop-blur-sm rounded-2xl shadow-md p-4 mb-3 border border-white/50 scratch" 
+     style="--texture-offset-x: -<%= offset_x %>%; --texture-offset-y: -<%= offset_y %>%;"
      data-controller="audio-player"
      data-audio-player-url-value="<%= rails_blob_path(recording.audio_file) %>">
   

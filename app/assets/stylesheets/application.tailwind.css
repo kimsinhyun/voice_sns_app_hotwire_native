@@ -52,5 +52,57 @@
   .pt-safe-or-4 {
     padding-top: max(env(safe-area-inset-top), 1rem);
   }
+  
+  /* 스크래치 종이 질감 유틸리티 (Portable - 어디든 적용 가능) */
+  
+  /* 배경용 스크래치 질감 (body 등 큰 영역) */
+  .scratch-bg {
+    background-image: url('textured-paper.png');
+    background-repeat: repeat;
+    background-blend-mode: soft-light;
+  }
+  
+  /* 요소용 스크래치 질감 (카드, 박스 등) */
+  .scratch {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .scratch::before {
+    content: '';
+    position: absolute;
+    /* CSS 변수로 랜덤 offset 적용 (HTML에서 설정) */
+    top: var(--texture-offset-y, 0);
+    left: var(--texture-offset-x, 0);
+    /* 카드 전체를 덮도록 충분히 크게 설정 */
+    width: 200%;
+    height: 200%;
+    pointer-events: none;
+    z-index: 0;
+    background-image: url('paper_texture.jpeg');
+    background-size: 300px 300px;
+    background-repeat: repeat;
+    background-blend-mode: soft-light;
+    opacity: 0.4;
+  }
+  
+  /* 콘텐츠가 질감 위에 표시되도록 */
+  .scratch > * {
+    position: relative;
+    z-index: 1;
+  }
+  
+  /* 질감 강도 변형 (선택사항) */
+  .scratch-light::before {
+    opacity: 0.2;
+  }
+  
+  .scratch-medium::before {
+    opacity: 0.4;
+  }
+  
+  .scratch-heavy::before {
+    opacity: 0.6;
+  }
 }
 
