@@ -4,8 +4,9 @@
 1. [Bridge Component란?](#bridge-component란)
 2. [통신 구조](#통신-구조)
 3. [메시지 패턴](#메시지-패턴)
-4. [구현 예제](#구현-예제)
-5. [개발 원칙](#개발-원칙)
+4. [데이터를 포함한 메시지 전송](#데이터를-포함한-메시지-전송)
+5. [구현 예제](#구현-예제)
+6. [개발 원칙](#개발-원칙)
 
 ---
 
@@ -108,6 +109,375 @@ final class ButtonComponent: BridgeComponent {
 |------|--------|------|
 | JS → Native | `this.send(event, data, callback)` | 메시지 전송 및 응답 대기 |
 | Native → JS | `reply(to: event, with: data)` | 응답 전송 |
+
+---
+
+## 데이터를 포함한 메시지 전송
+
+### ⚠️ 중요: Callback 방식 사용 필수
+
+**Hotwire Native Bridge에서 데이터를 받으려면 반드시 callback 방식을 사용해야 합니다.**
+
+```javascript
+// ❌ async/await는 작동하지 않음
+const result = await this.send("getAudioData")
+// result는 undefined가 됨
+
+// ✅ callback 방식 사용
+this.send("getAudioData", {}, (result) => {
+  console.log("데이터 받음:", result.data)
+})
+```
+
+### JavaScript에서 데이터 받기
+
+Native에서 전송한 데이터는 **callback의 `result.data`에 위치**합니다:
+
+```javascript
+export default class extends BridgeComponent {
+  static component = "audio-recorder"
+
+  submit() {
+    // Native로 메시지 전송 (callback 방식)
+    this.send("getAudioData", {}, (result) => {
+      console.log("✅ Full result:", result)
+      // result = {
+      //   component: "audio-recorder",
+      //   data: { audioData: "base64..." },  // ← 실제 데이터
+      //   id: "5",
+      //   event: "getAudioData"
+      // }
+      
+      // 에러 처리
+      if (result?.data?.error) {
+        console.error("❌ Error:", result.data.error)
+        return
+      }
+      
+      // 데이터 접근
+      const audioData = result.data.audioData
+      console.log("✅ Audio data:", audioData.length, "chars")
+      
+      // Rails 서버로 전송
+      fetch('/recordings', {
+        method: 'POST',
+        body: JSON.stringify({ audio: audioData })
+      })
+    })
+  }
+}
+```
+
+### iOS에서 데이터 전송
+
+**Dictionary를 사용하여 데이터를 전송**합니다:
+
+```swift
+final class AudioRecorderComponent: BridgeComponent {
+    override class var name: String { "audio-recorder" }
+    
+    override func onReceive(message: Message) {
+        switch message.event {
+        case "getAudioData":
+            handleGetAudioData(message: message)
+        default:
+            break
+        }
+    }
+    
+    private func handleGetAudioData(message: Message) {
+        guard let url = recordingURL else {
+            // ❌ 에러 응답
+            reply(to: message.event, with: ["error": "No recording found"])
+            return
+        }
+        
+        do {
+            let data = try Data(contentsOf: url)
+            let base64 = data.base64EncodedString()
+            
+            // ✅ 성공 응답 (Dictionary 사용)
+            reply(to: message.event, with: ["audioData": base64])
+            
+        } catch {
+            // ❌ 에러 응답
+            reply(to: message.event, with: ["error": error.localizedDescription])
+        }
+    }
+}
+```
+
+**핵심 포인트:**
+- `reply(to: message.event, with: [key: value])` 형식 사용
+- `message.event` 사용 (하드코딩된 문자열 X)
+- Dictionary로 데이터 전달
+- 에러도 Dictionary로 전달
+
+### Android에서 데이터 전송
+
+**Map을 사용하여 데이터를 전송**합니다:
+
+```kotlin
+class AudioRecorderComponent(
+    name: String,
+    private val delegate: BridgeDelegate<HotwireDestination>
+) : BridgeComponent<HotwireDestination>(name, delegate) {
+
+    override fun onReceive(message: Message) {
+        when (message.event) {
+            "getAudioData" -> handleGetAudioData(message)
+        }
+    }
+
+    private fun handleGetAudioData(message: Message) {
+        if (recordingFile == null || !recordingFile!!.exists()) {
+            // ❌ 에러 응답
+            replyTo(message.event, mapOf("error" to "No recording found"))
+            return
+        }
+
+        try {
+            val bytes = recordingFile!!.readBytes()
+            val base64 = Base64.encodeToString(bytes, Base64.NO_WRAP)
+            
+            // ✅ 성공 응답 (Map 사용)
+            replyTo(message.event, mapOf("audioData" to base64))
+            
+        } catch (e: IOException) {
+            // ❌ 에러 응답
+            replyTo(message.event, mapOf("error" to e.message))
+        }
+    }
+}
+```
+
+**핵심 포인트:**
+- `replyTo(message.event, mapOf("key" to value))` 형식 사용
+- `message.event` 사용 (하드코딩된 문자열 X)
+- Map으로 데이터 전달
+- Serializable 객체 불필요
+
+### 실제 작동하는 예제
+
+**완전한 오디오 녹음 및 업로드 예제:**
+
+#### JavaScript (Stimulus)
+```javascript
+export default class extends BridgeComponent {
+  static component = "audio-recorder"
+
+  async startRecording() {
+    this.send("startRecording", {}, (result) => {
+      console.log("녹음 시작됨")
+    })
+  }
+
+  async stopRecording() {
+    this.send("stopRecording", {}, (result) => {
+      const duration = result.data.duration
+      console.log(`녹음 중지, 길이: ${duration}초`)
+    })
+  }
+
+  async submit() {
+    this.send("getAudioData", {}, (result) => {
+      if (result.data.error) {
+        alert(`오류: ${result.data.error}`)
+        return
+      }
+      
+      const audioData = result.data.audioData
+      
+      // Rails 서버로 업로드
+      fetch('/recordings', {
+        method: 'POST',
+        body: JSON.stringify({ audio_data: audioData }),
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': document.querySelector('[name="csrf-token"]').content
+        }
+      }).then(response => {
+        if (response.ok) {
+          window.location.reload()
+        }
+      })
+    })
+  }
+}
+```
+
+#### iOS (Swift)
+```swift
+final class AudioRecorderComponent: BridgeComponent {
+    override class var name: String { "audio-recorder" }
+    private var audioRecorder: AVAudioRecorder?
+    private var recordingURL: URL?
+    
+    override func onReceive(message: Message) {
+        switch message.event {
+        case "startRecording":
+            handleStartRecording(message: message)
+        case "stopRecording":
+            handleStopRecording(message: message)
+        case "getAudioData":
+            handleGetAudioData(message: message)
+        default:
+            break
+        }
+    }
+    
+    private func handleStopRecording(message: Message) {
+        let duration = audioRecorder?.currentTime ?? 0
+        audioRecorder?.stop()
+        
+        // Duration 전송
+        reply(to: message.event, with: ["duration": duration])
+    }
+    
+    private func handleGetAudioData(message: Message) {
+        guard let url = recordingURL else {
+            reply(to: message.event, with: ["error": "No recording"])
+            return
+        }
+        
+        do {
+            let data = try Data(contentsOf: url)
+            let base64 = data.base64EncodedString()
+            reply(to: message.event, with: ["audioData": base64])
+        } catch {
+            reply(to: message.event, with: ["error": error.localizedDescription])
+        }
+    }
+}
+```
+
+#### Android (Kotlin)
+```kotlin
+class AudioRecorderComponent(
+    name: String,
+    private val delegate: BridgeDelegate<HotwireDestination>
+) : BridgeComponent<HotwireDestination>(name, delegate) {
+    
+    private var mediaRecorder: MediaRecorder? = null
+    private var recordingFile: File? = null
+    
+    override fun onReceive(message: Message) {
+        when (message.event) {
+            "startRecording" -> handleStartRecording(message)
+            "stopRecording" -> handleStopRecording(message)
+            "getAudioData" -> handleGetAudioData(message)
+        }
+    }
+    
+    private fun handleStopRecording(message: Message) {
+        mediaRecorder?.stop()
+        val duration = calculateDuration()
+        
+        // Duration 전송
+        replyTo(message.event, mapOf("duration" to duration))
+    }
+    
+    private fun handleGetAudioData(message: Message) {
+        if (recordingFile == null) {
+            replyTo(message.event, mapOf("error" to "No recording"))
+            return
+        }
+        
+        try {
+            val bytes = recordingFile!!.readBytes()
+            val base64 = Base64.encodeToString(bytes, Base64.NO_WRAP)
+            replyTo(message.event, mapOf("audioData" to base64))
+        } catch (e: Exception) {
+            replyTo(message.event, mapOf("error" to e.message))
+        }
+    }
+}
+```
+
+### 일반적인 실수와 해결책
+
+#### 1. async/await 사용
+```javascript
+// ❌ 작동하지 않음
+const result = await this.send("getAudioData")
+console.log(result)  // undefined
+
+// ✅ 올바른 방법
+this.send("getAudioData", {}, (result) => {
+  console.log(result.data)  // 데이터 수신됨
+})
+```
+
+#### 2. 데이터 접근 경로
+```javascript
+// ❌ 잘못된 접근
+this.send("getAudioData", {}, (result) => {
+  const data = result.audioData  // undefined
+})
+
+// ✅ 올바른 접근
+this.send("getAudioData", {}, (result) => {
+  const data = result.data.audioData  // 정상 작동
+})
+```
+
+#### 3. 하드코딩된 event 이름
+```swift
+// ❌ 하드코딩
+reply(to: "getAudioData", with: ["data": value])
+
+// ✅ message.event 사용
+reply(to: message.event, with: ["data": value])
+```
+
+#### 4. Serializable 객체 사용 (Android)
+```kotlin
+// ❌ 복잡하고 불필요
+@Serializable
+data class AudioDataResponse(val audioData: String)
+replyTo(message.event, AudioDataResponse(base64))
+
+// ✅ 간단한 Map 사용
+replyTo(message.event, mapOf("audioData" to base64))
+```
+
+#### 5. 에러 처리 누락
+```swift
+// ❌ 에러 시 빈 응답
+guard let url = recordingURL else {
+    reply(to: message.event)  // JavaScript에서 undefined 수신
+    return
+}
+
+// ✅ 에러 정보 전달
+guard let url = recordingURL else {
+    reply(to: message.event, with: ["error": "No recording"])
+    return
+}
+```
+
+### 디버깅 팁
+
+JavaScript에서 응답 구조를 확인하려면:
+
+```javascript
+this.send("getAudioData", {}, (result) => {
+  console.log("✅ Full result:", result)
+  console.log("📊 Result type:", typeof result)
+  console.log("📊 Result keys:", Object.keys(result))
+  console.log("📊 Result.data:", result.data)
+  console.log("📊 Data keys:", result.data ? Object.keys(result.data) : null)
+})
+```
+
+예상 출력:
+```
+✅ Full result: {component: "audio-recorder", data: {...}, id: "5", event: "getAudioData"}
+📊 Result type: object
+📊 Result keys: ["component", "data", "id", "event"]
+📊 Result.data: {audioData: "AAAAHGZ0..."}
+📊 Data keys: ["audioData"]
+```
 
 ---
 
@@ -338,4 +708,15 @@ const application = Application.start()
 **작성일**: 2025-10-12  
 **최종 업데이트**: 2025-10-15  
 **상태**: ✅ 완료
+
+---
+
+## 변경 이력
+
+- **2025-10-15**: "데이터를 포함한 메시지 전송" 섹션 추가
+  - Callback 방식 사용 필수 명시
+  - `result.data` 접근 방법 설명
+  - iOS Dictionary, Android Map 사용법
+  - 실제 작동하는 전체 예제 추가
+  - 일반적인 실수와 해결책 정리
 

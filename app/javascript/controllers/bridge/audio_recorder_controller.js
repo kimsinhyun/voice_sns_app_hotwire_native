@@ -6,14 +6,14 @@ export default class extends BridgeComponent {
   
   // Stimulus Targets
   static targets = [
-    "timer", "recordButton", "statusText", "circleProgress",
-    "recordingView", "previewView", "recordedDuration",
-    "playButton", "playIcon", "pauseIcon", "submitButton",
-    "playbackTime", "playbackTotal", "playbackProgress"
+    "recordButton", "recordProgress",
+    "playbackButton", "playIcon", "stopIcon",
+    "submitButton"
   ]
   
   // Stimulus Values
   static values = {
+    submitUrl: String,
     maxDuration: { type: Number, default: 10 }
   }
   
@@ -23,15 +23,15 @@ export default class extends BridgeComponent {
     
     this.isRecording = false
     this.isPlaying = false
+    this.hasRecording = false
     this.currentTime = 0
     this.recordedDuration = 0
     this.timerInterval = null
-    this.startTime = null
-    this.circleCircumference = 2 * Math.PI * 112 // SVG circle
     this.playbackTimer = null
-    this.playbackStartTime = null
+    this.startTime = null
     
-    console.log("✅ Bridge Audio Recorder connected")
+    console.log("✅ Audio Recorder connected")
+    console.log("📤 Submit URL:", this.submitUrlValue)
   }
   
   disconnect() {
@@ -42,77 +42,66 @@ export default class extends BridgeComponent {
   
   // MARK: - 녹음 시작/중지
   
-  async toggleRecording() {
+  toggleRecording() {
     console.log("🎤 Toggle recording, isRecording:", this.isRecording)
     
     if (this.isRecording) {
-      await this.stopRecording()
+      this.stopRecording()
     } else {
-      await this.startRecording()
+      // 재녹음 시 기존 녹음 폐기
+      if (this.hasRecording) {
+        console.log("♻️ Discarding previous recording")
+        this.hasRecording = false
+        this.hidePlaybackControls()
+      }
+      this.startRecording()
     }
   }
   
-  async startRecording() {
+  startRecording() {
     if (this.isRecording) return
     
     console.log("🎤 Sending startRecording to native...")
     
-    try {
-      // Native로 메시지 전송
-      await this.send("startRecording")
-      
+    this.send("startRecording", {}, (result) => {
       console.log("✅ Recording started via native")
       this.isRecording = true
       this.currentTime = 0
       this.startTime = Date.now()
       
-      // UI 업데이트 (JavaScript만)
-      this.updateUIForRecording(true)
+      // 진행도 초기화
+      this.resetRecordProgress()
+      
+      // 타이머 시작 (진행도 업데이트)
       this.startTimer()
-    } catch (error) {
-      console.error("❌ Bridge message failed:", error)
-      alert("녹음을 시작할 수 없습니다.")
-    }
+    })
   }
   
-  async stopRecording() {
+  stopRecording() {
     if (!this.isRecording) return
     
     console.log("🎤 Sending stopRecording to native...")
     
-    try {
-      // Native로 메시지 전송
-      const result = await this.send("stopRecording")
-      
+    this.send("stopRecording", {}, (result) => {
       console.log("✅ Recording stopped, result:", result)
-      console.log("📊 Duration from native:", result?.duration)
+      console.log("📊 Duration from native:", result?.data?.duration)
       
       this.isRecording = false
-      this.recordedDuration = result?.duration || this.currentTime
+      this.recordedDuration = result?.data?.duration || this.currentTime
+      this.hasRecording = true
       this.stopTimer()
       
       console.log("📊 Final recorded duration:", this.recordedDuration)
       
-      // UI 업데이트
-      this.updateUIForRecording(false)
-      
-      // 1초 후 미리듣기 화면으로 전환
-      setTimeout(() => this.showPreviewView(), 1000)
-    } catch (error) {
-      console.error("❌ Stop recording failed:", error)
-      // 오류 시에도 현재 시간으로 fallback
-      this.recordedDuration = this.currentTime
-      this.isRecording = false
-      this.stopTimer()
-      this.updateUIForRecording(false)
-      setTimeout(() => this.showPreviewView(), 1000)
-    }
+      // 미리듣기 및 제출 버튼 표시
+      this.showPlaybackControls()
+    })
   }
   
-  // MARK: - 타이머 (UI만)
+  // MARK: - 타이머 (진행도 업데이트)
   
   startTimer() {
-    this.timerInterval = setInterval(() => this.updateTimer(), 100)
+    this.timerInterval = setInterval(() => this.updateRecordProgress(), 100)
   }
   
   stopTimer() {
@@ -122,21 +111,16 @@ export default class extends BridgeComponent {
     }
   }
   
-  updateTimer() {
+  updateRecordProgress() {
     const elapsed = (Date.now() - this.startTime) / 1000
     this.currentTime = elapsed
-    const remaining = this.maxDurationValue - elapsed
     
-    // 타이머 텍스트
-    if (this.hasTimerTarget) {
-      this.timerTarget.textContent = Math.max(0, remaining).toFixed(1)
-    }
+    // 진행도 계산 (0-100%)
+    const progress = Math.min((elapsed / this.maxDurationValue) * 100, 100)
     
-    // 원형 진행 바
-    if (this.hasCircleProgressTarget) {
-      const progress = elapsed / this.maxDurationValue
-      const offset = this.circleCircumference * (1 - progress)
-      this.circleProgressTarget.style.strokeDashoffset = offset
+    // clip-path 업데이트 (왼쪽에서 오른쪽으로 채워짐)
+    if (this.hasRecordProgressTarget) {
+      this.recordProgressTarget.style.clipPath = `inset(0 ${100 - progress}% 0 0)`
     }
     
     // 최대 시간 도달 시 자동 중지
@@ -145,209 +129,202 @@ export default class extends BridgeComponent {
     }
   }
   
-  // MARK: - UI 업데이트
-  
-  updateUIForRecording(isRecording) {
-    if (this.hasStatusTextTarget) {
-      this.statusTextTarget.textContent = isRecording ? "탭하여 중지" : "처리 중..."
+  resetRecordProgress() {
+    if (this.hasRecordProgressTarget) {
+      this.recordProgressTarget.style.clipPath = `inset(0 100% 0 0)`
     }
-  }
-  
-  showPreviewView() {
-    if (this.hasRecordingViewTarget && this.hasPreviewViewTarget) {
-      this.recordingViewTarget.classList.add("hidden")
-      this.previewViewTarget.classList.remove("hidden")
-      this.previewViewTarget.classList.add("flex")
-    }
-    
-    const duration = this.recordedDuration || this.currentTime
-    
-    // "녹음완료! X.X초" 표시
-    if (this.hasRecordedDurationTarget) {
-      this.recordedDurationTarget.textContent = `${duration.toFixed(1)}초`
-      console.log("📊 Recorded duration:", duration)
-    }
-    
-    // 오디오 플레이어 시간 표시 (MM:SS 형식)
-    if (this.hasPlaybackTotalTarget) {
-      const minutes = Math.floor(duration / 60)
-      const seconds = Math.floor(duration % 60)
-      this.playbackTotalTarget.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`
-      console.log("⏱️ Total duration formatted:", this.playbackTotalTarget.textContent)
-    }
-    
-    // 현재 재생 시간 초기화
-    if (this.hasPlaybackTimeTarget) {
-      this.playbackTimeTarget.textContent = "0:00"
-    }
-    
-    console.log("✅ Preview view shown with duration:", duration)
   }
   
   // MARK: - 미리듣기
   
-  async togglePlayback() {
+  togglePlayback() {
     console.log("🎵 Toggle playback, isPlaying:", this.isPlaying)
     
     if (this.isPlaying) {
-      await this.pausePlayback()
+      this.stopPlayback()
     } else {
-      await this.playAudio()
+      this.playAudio()
     }
   }
   
-  async playAudio() {
+  playAudio() {
     console.log("🎵 Sending playAudio to native...")
     
-    try {
-      const result = await this.send("playAudio")
+    this.send("playAudio", {}, (result) => {
       console.log("✅ Audio playing result:", result)
       
-      // 재생 완료 시 자동으로 아이콘 토글
-      if (result?.finished) {
-        console.log("🎵 Playback finished, resetting UI")
-        this.isPlaying = false
-        this.updatePlaybackUI()
-        this.stopPlaybackTimer()
-      } else {
-        console.log("🎵 Playback started")
-        this.isPlaying = true
-        this.updatePlaybackUI()
+      this.isPlaying = true
+      this.updatePlaybackUI()
+      
+      // 재생 완료 타이머 시작 (recordedDuration 사용)
+      if (this.recordedDuration > 0) {
         this.startPlaybackTimer()
       }
-    } catch (error) {
-      console.error("❌ Play audio failed:", error)
-      alert("재생할 수 없습니다.")
-    }
+    })
   }
   
-  async pausePlayback() {
-    console.log("⏸️ Sending pauseAudio to native...")
+  stopPlayback() {
+    console.log("⏹️ Sending stopAudio to native...")
     
-    try {
-      const result = await this.send("pauseAudio")
-      console.log("✅ Audio paused, result:", result)
+    this.send("stopAudio", {}, (result) => {
+      console.log("✅ Audio stopped, result:", result)
       
       this.isPlaying = false
-      this.updatePlaybackUI()
       this.stopPlaybackTimer()
-    } catch (error) {
-      console.error("❌ Pause audio failed:", error)
+      this.updatePlaybackUI()
+    })
+  }
+  
+  startPlaybackTimer() {
+    this.stopPlaybackTimer()
+    
+    console.log(`⏱️ Starting playback timer for ${this.recordedDuration}s`)
+    
+    this.playbackTimer = setTimeout(() => {
+      console.log("🎵 Audio playback finished (via timer)")
+      this.handlePlaybackFinished()
+    }, this.recordedDuration * 1000)
+  }
+  
+  stopPlaybackTimer() {
+    if (this.playbackTimer) {
+      clearTimeout(this.playbackTimer)
+      this.playbackTimer = null
     }
   }
   
   updatePlaybackUI() {
-    if (this.hasPlayIconTarget && this.hasPauseIconTarget) {
+    if (this.hasPlayIconTarget && this.hasStopIconTarget) {
       if (this.isPlaying) {
         this.playIconTarget.classList.add("hidden")
-        this.pauseIconTarget.classList.remove("hidden")
+        this.stopIconTarget.classList.remove("hidden")
       } else {
         this.playIconTarget.classList.remove("hidden")
-        this.pauseIconTarget.classList.add("hidden")
+        this.stopIconTarget.classList.add("hidden")
       }
     }
   }
   
+  showPlaybackControls() {
+    if (this.hasPlaybackButtonTarget) {
+      this.playbackButtonTarget.classList.remove("invisible")
+      this.playbackButtonTarget.classList.add("visible")
+    }
+    if (this.hasSubmitButtonTarget) {
+      this.submitButtonTarget.classList.remove("invisible")
+      this.submitButtonTarget.classList.add("visible")
+    }
+  }
+  
+  hidePlaybackControls() {
+    if (this.hasPlaybackButtonTarget) {
+      this.playbackButtonTarget.classList.add("invisible")
+      this.playbackButtonTarget.classList.remove("visible")
+    }
+    if (this.hasSubmitButtonTarget) {
+      this.submitButtonTarget.classList.add("invisible")
+      this.submitButtonTarget.classList.remove("visible")
+    }
+    
+    // 재생 상태 초기화
+    this.isPlaying = false
+    this.updatePlaybackUI()
+  }
+  
+  // 재생 완료 처리 (타이머에서 호출됨)
+  handlePlaybackFinished() {
+    console.log("🎵 Audio playback finished")
+    this.isPlaying = false
+    this.stopPlaybackTimer()
+    this.updatePlaybackUI()
+  }
+  
   // MARK: - 게시하기
   
-  async submit() {
+  submit() {
+    if (!this.hasRecording) {
+      alert("녹음된 파일이 없습니다.")
+      return
+    }
+    
     if (this.hasSubmitButtonTarget) {
       this.submitButtonTarget.disabled = true
-      this.submitButtonTarget.textContent = "업로드 중..."
+      this.submitButtonTarget.classList.add("opacity-50")
     }
     
     console.log("📤 Requesting audio data from native...")
     
-    try {
-      // Native에서 Base64 데이터 가져오기
-      const result = await this.send("getAudioData")
-      
+    // Native에서 Base64 데이터 가져오기 (callback 방식)
+    this.send("getAudioData", {}, (result) => {
       console.log("✅ Audio data result:", result)
+      console.log("📊 Result type:", typeof result)
+      console.log("📊 Result keys:", result ? Object.keys(result) : "null")
+      console.log("📊 Result.data:", result?.data)
       
-      if (!result?.audioData) {
-        throw new Error("No audio data received from native")
+      // 에러 응답 확인
+      if (result?.data?.error) {
+        console.error("❌ Native error:", result.data.error)
+        alert(`업로드 중 오류가 발생했습니다: ${result.data.error}`)
+        
+        if (this.hasSubmitButtonTarget) {
+          this.submitButtonTarget.disabled = false
+          this.submitButtonTarget.classList.remove("opacity-50")
+        }
+        return
       }
       
-      console.log("✅ Audio data received:", result.audioData.length, "chars")
+      // audioData 확인
+      if (!result?.data?.audioData) {
+        console.error("❌ No audioData in result:", result)
+        alert("업로드 중 오류가 발생했습니다: No audio data received from native")
+        
+        if (this.hasSubmitButtonTarget) {
+          this.submitButtonTarget.disabled = false
+          this.submitButtonTarget.classList.remove("opacity-50")
+        }
+        return
+      }
+      
+      const audioData = result.data.audioData
+      console.log("✅ Audio data received:", audioData.length, "chars")
+      console.log("✅ Audio data sample:", audioData.substring(0, 50))
       
       // Rails 서버로 전송
       const formData = new FormData()
-      formData.append('recording[audio_data]', result.audioData)
+      formData.append('recording[audio_data]', audioData)
       
-      const response = await fetch('/recordings', {
+      console.log("📤 Uploading to server:", this.submitUrlValue)
+      
+      fetch(this.submitUrlValue, {
         method: 'POST',
         body: formData,
         headers: {
           'X-CSRF-Token': document.querySelector('[name="csrf-token"]').content
         }
       })
-      
-      if (response.ok) {
-        console.log("✅ Upload successful")
-        window.location.href = "/feed"
-      } else {
-        throw new Error('Upload failed')
-      }
-      
-    } catch (error) {
-      console.error("❌ Submit failed:", error)
-      alert("업로드 중 오류가 발생했습니다")
-      
-      if (this.hasSubmitButtonTarget) {
-        this.submitButtonTarget.disabled = false
-        this.submitButtonTarget.textContent = "게시하기"
-      }
-    }
-  }
-  
-  // MARK: - 취소
-  
-  cancel() {
-    if (confirm("녹음을 취소하시겠습니까?")) {
-      window.location.href = "/feed"
-    }
-  }
-  
-  // MARK: - 재생 진행 바 타이머
-  
-  startPlaybackTimer() {
-    this.playbackStartTime = Date.now()
-    this.playbackTimer = setInterval(() => this.updatePlaybackProgress(), 100)
-    console.log("🎵 Playback timer started")
-  }
-  
-  stopPlaybackTimer() {
-    if (this.playbackTimer) {
-      clearInterval(this.playbackTimer)
-      this.playbackTimer = null
-      console.log("🎵 Playback timer stopped")
-    }
-  }
-  
-  updatePlaybackProgress() {
-    const elapsed = (Date.now() - this.playbackStartTime) / 1000
-    const duration = this.recordedDuration || this.currentTime
-    
-    // 현재 시간 표시 (MM:SS)
-    if (this.hasPlaybackTimeTarget) {
-      const minutes = Math.floor(elapsed / 60)
-      const seconds = Math.floor(elapsed % 60)
-      this.playbackTimeTarget.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`
-    }
-    
-    // 진행 바 업데이트
-    if (this.hasPlaybackProgressTarget) {
-      const progress = Math.min((elapsed / duration) * 100, 100)
-      this.playbackProgressTarget.style.width = `${progress}%`
-    }
-    
-    // 재생 완료 시 타이머 정리 (Native의 타이머와 동기화)
-    if (elapsed >= duration) {
-      this.stopPlaybackTimer()
-      this.isPlaying = false
-      this.updatePlaybackUI()
-      console.log("🎵 Playback finished via JavaScript timer")
-    }
+      .then(response => {
+        console.log("📥 Server response status:", response.status)
+        
+        if (response.ok) {
+          console.log("✅ Upload successful")
+          window.location.reload()
+        } else {
+          return response.text().then(errorText => {
+            console.error("❌ Server error:", errorText)
+            throw new Error(`Upload failed: ${response.status}`)
+          })
+        }
+      })
+      .catch(error => {
+        console.error("❌ Upload failed:", error)
+        alert(`업로드 중 오류가 발생했습니다: ${error.message}`)
+        
+        if (this.hasSubmitButtonTarget) {
+          this.submitButtonTarget.disabled = false
+          this.submitButtonTarget.classList.remove("opacity-50")
+        }
+      })
+    })
   }
 }
 
