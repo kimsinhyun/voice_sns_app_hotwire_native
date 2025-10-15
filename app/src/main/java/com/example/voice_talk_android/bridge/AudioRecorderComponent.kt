@@ -111,11 +111,11 @@ class AudioRecorderComponent(
             Log.d(TAG, "📁 File exists: ${recordingFile?.exists()}, size: ${recordingFile?.length()} bytes")
 
             // Duration을 JavaScript로 전송
-            replyTo(message.event, StopRecordingResponse(duration))
+            replyTo(message.event, mapOf("duration" to duration))
 
         } catch (e: Exception) {
             Log.e(TAG, "❌ Stop recording failed: ${e.message}")
-            replyTo(message.event)
+            replyTo(message.event, mapOf("error" to "Stop recording failed: ${e.message}"))
         }
     }
 
@@ -173,7 +173,7 @@ class AudioRecorderComponent(
 
         if (recordingFile == null || !recordingFile!!.exists()) {
             Log.e(TAG, "❌ No recording found")
-            replyTo(message.event)
+            replyTo(message.event, mapOf("error" to "No recording found"))
             return
         }
 
@@ -184,11 +184,11 @@ class AudioRecorderComponent(
             Log.d(TAG, "✅ Audio data encoded: ${bytes.size} bytes → ${base64.length} chars")
 
             // Base64 데이터를 JavaScript로 전송
-            replyTo(message.event, AudioDataResponse(base64))
+            replyTo(message.event, mapOf("audioData" to base64))
 
         } catch (e: IOException) {
             Log.e(TAG, "❌ Failed to read audio file: ${e.message}")
-            replyTo(message.event)
+            replyTo(message.event, mapOf("error" to "Failed to read audio file: ${e.message}"))
         }
     }
 
@@ -201,13 +201,5 @@ class AudioRecorderComponent(
             Manifest.permission.RECORD_AUDIO
         ) == PackageManager.PERMISSION_GRANTED
     }
-
-    // MARK: - Response Data Classes
-    
-    @Serializable
-    data class StopRecordingResponse(val duration: Double)
-    
-    @Serializable
-    data class AudioDataResponse(val audioData: String)
 }
 
