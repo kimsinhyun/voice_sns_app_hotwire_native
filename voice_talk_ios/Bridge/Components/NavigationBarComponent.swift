@@ -21,25 +21,25 @@ final class NavigationBarComponent: BridgeComponent {
         
         switch event {
         case .hide:
-            handleHide()
+            handleHide(message: message)
         case .show:
-            handleShow()
+            handleShow(message: message)
         }
     }
     
     // MARK: - Private Methods
     
-    private func handleHide() {
+    private func handleHide(message: Message) {
         guard let viewController = delegate?.destination as? UIViewController else { return }
         viewController.navigationController?.setNavigationBarHidden(true, animated: true)
-        reply(to: "hide", with: ["success": true])
+        reply(to: "hide")
         print("✅ Navigation bar hidden")
     }
     
-    private func handleShow() {
+    private func handleShow(message: Message) {
         guard let viewController = delegate?.destination as? UIViewController else { return }
         viewController.navigationController?.setNavigationBarHidden(false, animated: true)
-        reply(to: "show", with: ["success": true])
+        reply(to: "show")
         print("✅ Navigation bar shown")
     }
 }
