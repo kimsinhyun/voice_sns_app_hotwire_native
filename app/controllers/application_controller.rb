@@ -8,13 +8,4 @@ class ApplicationController < ActionController::Base
     request.user_agent.to_s.match?(/Turbo Native/)
   end
   helper_method :hotwire_native_app?
-
-  # Redirect after sign in
-  def after_sign_in_path_for(resource)
-    if resource.is_a?(User)
-      feed_path
-    else
-      super
-    end
-  end
 end

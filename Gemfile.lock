@@ -142,6 +142,7 @@ GEM
     erubi (1.13.1)
     et-orbi (1.4.0)
       tzinfo
+    ffi (1.17.2-arm64-darwin)
     formtastic (5.0.0)
       actionpack (>= 6.0.0)
     formtastic_i18n (0.7.0)
@@ -155,6 +156,9 @@ GEM
       activesupport (>= 5.2)
     i18n (1.14.7)
       concurrent-ruby (~> 1.0)
+    image_processing (1.14.0)
+      mini_magick (>= 4.9.5, < 6)
+      ruby-vips (>= 2.0.17, < 3)
     importmap-rails (2.2.2)
       actionpack (>= 6.0.0)
       activesupport (>= 6.0.0)
@@ -209,6 +213,8 @@ GEM
       net-smtp
     marcel (1.1.0)
     matrix (0.4.3)
+    mini_magick (5.3.0)
+      logger
     mini_mime (1.1.5)
     minitest (5.26.0)
     msgpack (1.8.0)
@@ -355,6 +361,9 @@ GEM
       rubocop-performance (>= 1.24)
       rubocop-rails (>= 2.30)
     ruby-progressbar (1.13.0)
+    ruby-vips (2.2.4)
+      ffi (~> 1.12)
+      logger
     ruby2_keywords (0.0.5)
     rubyzip (3.1.1)
     securerandom (0.4.1)
@@ -453,6 +462,7 @@ DEPENDENCIES
   devise
   dotenv-rails
   draper
+  image_processing (~> 1.2)
   importmap-rails
   jbuilder
   kamal

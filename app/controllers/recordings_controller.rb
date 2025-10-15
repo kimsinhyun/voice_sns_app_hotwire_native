@@ -58,3 +58,7 @@ class RecordingsController < ApplicationController
   end
 end
 
+#
+# user = User.last
+# r= Recording.create!(user: user)
+# r.audio_file.attach(io: File.open("#{Rails.root}/app/assets/audios/tts_audio_7719.mp3"), filename: "tts_audio_7719.mp3", content_type: "audio/mp3")

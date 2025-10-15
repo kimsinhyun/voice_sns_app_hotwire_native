@@ -1,52 +1,17 @@
-<div class="bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition-all"
-		 data-controller="audio-player"
-		 data-audio-player-url-value="<%= url_for(recording.audio_file) %>"
-		 data-audio-player-duration-value="<%= recording.audio_file.blob.byte_size %>">
+<div class="bg-white rounded-lg shadow p-4 mb-4">
+	<!-- 디버깅 정보 -->
+	<div class="mb-4 text-xs text-gray-600 space-y-1">
+		<div><strong>파일명:</strong> <%= recording.audio_file.filename %></div>
+		<div><strong>Content Type:</strong> <%= recording.audio_file.content_type %></div>
+		<div><strong>파일 크기:</strong> <%= number_to_human_size(recording.audio_file.byte_size) %></div>
+		<div><strong>URL:</strong> <%= rails_blob_path(recording.audio_file, disposition: "inline") %></div>
+	</div>
 
-	<div class="flex items-center gap-4">
-		<!-- 재생/일시정지 버튼 -->
-		<button type="button"
-						data-action="click->audio-player#toggle"
-						data-audio-player-target="playButton"
-						class="w-12 h-12 rounded-full bg-gradient-to-br from-[#F5A08D] to-[#FFAA91] shadow-md hover:shadow-lg transform hover:scale-105 active:scale-95 transition-all flex items-center justify-center flex-shrink-0">
-			<!-- 재생 아이콘 -->
-			<svg class="w-5 h-5 text-white ml-0.5"
-					 data-audio-player-target="playIcon"
-					 fill="currentColor"
-					 viewBox="0 0 24 24">
-				<path d="M8 5v14l11-7z"/>
-			</svg>
-			<!-- 일시정지 아이콘 -->
-			<svg class="w-5 h-5 text-white hidden"
-					 data-audio-player-target="pauseIcon"
-					 fill="currentColor"
-					 viewBox="0 0 24 24">
-				<path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
-			</svg>
-		</button>
-
-		<!-- 정보 및 진행 바 -->
-		<div class="flex-1 min-w-0">
-			<!-- 사용자 정보 -->
-			<div class="flex items-center justify-between mb-1">
-				<span class="text-sm font-medium text-gray-700">User #<%= recording.user_id %></span>
-				<span class="text-xs text-gray-500" data-audio-player-target="duration">
-					<%= recording.created_at.strftime("%m/%d %H:%M") %>
-				</span>
-			</div>
-
-			<!-- 진행 바 -->
-			<div class="relative h-1.5 bg-gray-200 rounded-full overflow-hidden mb-1">
-				<div class="absolute h-full bg-gradient-to-r from-[#F5A08D] to-[#FFAA91] transition-all duration-100"
-						 data-audio-player-target="progress"
-						 style="width: 0%"></div>
-			</div>
-
-			<!-- 시간 -->
-			<div class="flex justify-between text-xs text-gray-500">
-				<span data-audio-player-target="currentTime">0:00</span>
-				<span data-audio-player-target="totalTime">--:--</span>
-			</div>
-		</div>
+	<!-- 방법 1: audio_tag with rails_blob_path -->
+	<div class="mb-3">
+		<p class="text-sm font-semibold mb-1">방법 1: audio_tag + rails_blob_path</p>
+		<%= audio_tag rails_blob_path(recording.audio_file, disposition: "inline"), 
+								controls: true, 
+								class: "w-full" %>
 	</div>
 </div>

@@ -19,13 +19,13 @@
 
 	<%# Includes all stylesheet files in app/assets/stylesheets %>
 	<%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
-	<%= stylesheet_link_tag :native if hotwire_native_app? %>
+	<%#= stylesheet_link_tag :native if hotwire_native_app? %>
 
 	<%= javascript_importmap_tags %>
 </head>
 
 	<body class="bg-[#FDEBD0] flex flex-col h-dvh">
-		<main class="flex-1 overflow-y-auto">
+		<main class="flex-1 overflow-y-auto pt-4">
 			<%= yield %>
 		</main>
 		<div>
