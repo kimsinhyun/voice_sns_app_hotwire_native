@@ -65,18 +65,18 @@ final class AudioRecorderComponent: BridgeComponent {
                     self?.startRecordingWithPermission(message: message)
                 } else {
                     print("❌ Microphone permission denied")
-                    self?.reply(to: "startRecording")
+                    self?.reply(to: message.event)
                 }
             }
         case .denied:
             print("❌ Microphone permission denied by user")
-            reply(to: "startRecording")
+            reply(to: message.event)
         case .granted:
             print("✅ Microphone permission already granted")
             startRecordingWithPermission(message: message)
         @unknown default:
             print("❌ Unknown permission status")
-            reply(to: "startRecording")
+            reply(to: message.event)
         }
     }
     
@@ -95,18 +95,18 @@ final class AudioRecorderComponent: BridgeComponent {
                     self?.startRecordingWithPermission(message: message)
                 } else {
                     print("❌ Microphone permission denied")
-                    self?.reply(to: "startRecording")
+                    self?.reply(to: message.event)
                 }
             }
         case .denied:
             print("❌ Microphone permission denied by user")
-            reply(to: "startRecording")
+            reply(to: message.event)
         case .granted:
             print("✅ Microphone permission already granted")
             startRecordingWithPermission(message: message)
         @unknown default:
             print("❌ Unknown permission status")
-            reply(to: "startRecording")
+            reply(to: message.event)
         }
     }
     
@@ -169,11 +169,11 @@ final class AudioRecorderComponent: BridgeComponent {
                 print("✅ Recording started: \(fileURL.lastPathComponent)")
                 print("📁 Recording path: \(fileURL.path)")
                 print("⏱️ Recorder is recording: \(recorder.isRecording)")
-                reply(to: "startRecording")
+                reply(to: message.event)
             } else {
                 print("❌ Recording failed to start (record() returned false)")
                 print("🔍 Recorder state - isRecording: \(recorder.isRecording)")
-                reply(to: "startRecording")
+                reply(to: message.event)
             }
             
         } catch let error as NSError {
@@ -182,7 +182,7 @@ final class AudioRecorderComponent: BridgeComponent {
             print("❌ Error code: \(error.code)")
             print("❌ Error description: \(error.localizedDescription)")
             print("❌ Error info: \(error.userInfo)")
-            reply(to: "startRecording")
+            reply(to: message.event)
         }
     }
     
@@ -193,7 +193,7 @@ final class AudioRecorderComponent: BridgeComponent {
         
         guard let recorder = audioRecorder else {
             print("❌ No active recording")
-            reply(to: "stopRecording")
+            reply(to: message.event, with: ["error": "No active recording"])
             return
         }
         
@@ -209,8 +209,7 @@ final class AudioRecorderComponent: BridgeComponent {
         }
         
         // Duration을 JavaScript로 전송
-        let response = StopRecordingResponse(duration: duration)
-        reply(to: "stopRecording", with: response)
+        reply(to: message.event, with: ["duration": duration])
     }
     
     // MARK: - 미리듣기 재생
@@ -220,14 +219,14 @@ final class AudioRecorderComponent: BridgeComponent {
         
         guard let url = recordingURL else {
             print("❌ No recording URL found")
-            reply(to: "playAudio")
+            reply(to: message.event)
             return
         }
         
         // 파일 존재 확인
         guard FileManager.default.fileExists(atPath: url.path) else {
             print("❌ Recording file does not exist at path: \(url.path)")
-            reply(to: "playAudio")
+            reply(to: message.event)
             return
         }
         
@@ -247,19 +246,19 @@ final class AudioRecorderComponent: BridgeComponent {
             
             guard let player = audioPlayer else {
                 print("❌ Failed to create audio player")
-                reply(to: "playAudio")
+                reply(to: message.event)
                 return
             }
             
             player.play()
             
             print("✅ Audio playing, duration: \(player.duration)s")
-            reply(to: "playAudio")
+            reply(to: message.event)
             
         } catch {
             print("❌ Playback failed: \(error.localizedDescription)")
             print("❌ File path: \(url.path)")
-            reply(to: "playAudio")
+            reply(to: message.event)
         }
     }
     
@@ -268,7 +267,7 @@ final class AudioRecorderComponent: BridgeComponent {
     private func handlePauseAudio(message: Message) {
         audioPlayer?.pause()
         print("⏸️ Audio paused")
-        reply(to: "pauseAudio")
+        reply(to: message.event)
     }
     
     // MARK: - 미리듣기 중지 (처음부터 재생용)
@@ -277,17 +276,25 @@ final class AudioRecorderComponent: BridgeComponent {
         audioPlayer?.stop()
         audioPlayer?.currentTime = 0  // 재생 위치를 처음으로 되돌림
         print("⏹️ Audio stopped and reset to beginning")
-        reply(to: "stopAudio")
+        reply(to: message.event)
     }
     
     // MARK: - 오디오 데이터 가져오기 (Base64)
     
     private func handleGetAudioData(message: Message) {
         print("📦 Getting audio data...")
+        print("📁 Recording URL: \(recordingURL?.path ?? "nil")")
         
         guard let url = recordingURL else {
             print("❌ No recording found")
-            reply(to: "getAudioData")
+            reply(to: message.event, with: ["error": "No recording found"])
+            return
+        }
+        
+        // 파일 존재 확인
+        guard FileManager.default.fileExists(atPath: url.path) else {
+            print("❌ Recording file does not exist at path: \(url.path)")
+            reply(to: message.event, with: ["error": "Recording file not found"])
             return
         }
         
@@ -296,14 +303,15 @@ final class AudioRecorderComponent: BridgeComponent {
             let base64 = data.base64EncodedString()
             
             print("✅ Audio data encoded: \(data.count) bytes → \(base64.count) chars")
+            print("✅ Base64 sample: \(String(base64.prefix(50)))...")
             
             // Base64 데이터를 JavaScript로 전송
-            let responseData = AudioDataResponse(audioData: base64)
-            reply(to: "getAudioData", with: responseData)
+            reply(to: message.event, with: ["audioData": base64])
             
         } catch {
             print("❌ Failed to read audio file: \(error.localizedDescription)")
-            reply(to: "getAudioData")
+            print("❌ Error details: \(error)")
+            reply(to: message.event, with: ["error": error.localizedDescription])
         }
     }
     
@@ -316,17 +324,5 @@ final class AudioRecorderComponent: BridgeComponent {
         case pauseAudio
         case stopAudio
         case getAudioData
-    }
-}
-
-// MARK: - Response Data
-
-private extension AudioRecorderComponent {
-    struct StopRecordingResponse: Encodable {
-        let duration: TimeInterval
-    }
-    
-    struct AudioDataResponse: Encodable {
-        let audioData: String
     }
 }
