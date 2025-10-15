@@ -10,7 +10,6 @@ final class AudioRecorderComponent: BridgeComponent {
     private var audioRecorder: AVAudioRecorder?
     private var audioPlayer: AVAudioPlayer?
     private var recordingURL: URL?
-    private var playbackTimer: Timer?
     
     // MARK: - Message Handling
     
@@ -254,16 +253,7 @@ final class AudioRecorderComponent: BridgeComponent {
             
             player.play()
             
-            // 재생 완료 시 JavaScript로 알림을 보내기 위한 타이머 설정
-            let duration = player.duration
-            playbackTimer?.invalidate()
-            playbackTimer = Timer.scheduledTimer(withTimeInterval: duration, repeats: false) { [weak self] _ in
-                print("🎵 Audio playback finished (via timer)")
-                let response = PlaybackFinishedResponse(finished: true)
-                self?.reply(to: "playAudio", with: response)
-            }
-            
-            print("✅ Audio playing, duration: \(duration)s")
+            print("✅ Audio playing, duration: \(player.duration)s")
             reply(to: "playAudio")
             
         } catch {
@@ -277,8 +267,6 @@ final class AudioRecorderComponent: BridgeComponent {
     
     private func handlePauseAudio(message: Message) {
         audioPlayer?.pause()
-        playbackTimer?.invalidate()
-        playbackTimer = nil
         print("⏸️ Audio paused")
         reply(to: "pauseAudio")
     }
@@ -288,8 +276,6 @@ final class AudioRecorderComponent: BridgeComponent {
     private func handleStopAudio(message: Message) {
         audioPlayer?.stop()
         audioPlayer?.currentTime = 0  // 재생 위치를 처음으로 되돌림
-        playbackTimer?.invalidate()
-        playbackTimer = nil
         print("⏹️ Audio stopped and reset to beginning")
         reply(to: "stopAudio")
     }
@@ -342,9 +328,5 @@ private extension AudioRecorderComponent {
     
     struct AudioDataResponse: Encodable {
         let audioData: String
-    }
-    
-    struct PlaybackFinishedResponse: Encodable {
-        let finished: Bool
     }
 }
