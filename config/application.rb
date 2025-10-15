@@ -8,6 +8,8 @@ Bundler.require(*Rails.groups)
 
 module VoiceTalk
   class Application < Rails::Application
+    config.active_storage.urls_expire_in = 1.hour
+
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 8.0
 

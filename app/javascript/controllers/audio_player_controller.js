@@ -1,202 +1,143 @@
 import { Controller } from "@hotwired/stimulus"
 
-// 오디오 재생을 위한 Stimulus Controller
+// 전역 AudioManager: 현재 재생 중인 컨트롤러 추적
+window.AudioManager = {
+  currentPlayer: null,
+  
+  play(controller) {
+    // 다른 플레이어가 재생 중이면 중지
+    if (this.currentPlayer && this.currentPlayer !== controller) {
+      this.currentPlayer.stop()
+    }
+    this.currentPlayer = controller
+  },
+  
+  stop(controller) {
+    if (this.currentPlayer === controller) {
+      this.currentPlayer = null
+    }
+  }
+}
+
 export default class extends Controller {
-  static targets = [
-    "audio", "playButton", "playIcon", "pauseIcon", 
-    "progress", "currentTime", "totalTime", "duration"
-  ]
+  static targets = ["audio", "playButton", "stopButton", "loadingButton"]
   static values = {
-    url: String,
-    duration: Number
+    url: String
   }
 
   connect() {
     this.isPlaying = false
-    this.updateInterval = null
-
-    console.log("🎵 === Audio Player Connect ===")
-    console.log("  hasAudioTarget:", this.hasAudioTarget)
-    
-    if (this.hasAudioTarget) {
-      console.log("  Audio src:", this.audioTarget.src)
-      console.log("  Audio readyState:", this.audioTarget.readyState)
-      console.log("  Audio networkState:", this.audioTarget.networkState)
-      console.log("  canPlayType (audio/mpeg):", this.audioTarget.canPlayType('audio/mpeg'))
-      console.log("  canPlayType (audio/mp3):", this.audioTarget.canPlayType('audio/mp3'))
-      console.log("  canPlayType (audio/wav):", this.audioTarget.canPlayType('audio/wav'))
-      console.log("  canPlayType (audio/webm):", this.audioTarget.canPlayType('audio/webm'))
-      
-      // URL 테스트 - fetch로 실제 접근 가능한지 확인
-      fetch(this.audioTarget.src, { method: 'HEAD' })
-        .then(response => {
-          console.log("📡 Audio URL fetch test:")
-          console.log("  Status:", response.status)
-          console.log("  Content-Type:", response.headers.get('Content-Type'))
-          console.log("  Content-Length:", response.headers.get('Content-Length'))
-        })
-        .catch(err => {
-          console.error("❌ Audio URL fetch failed:", err)
-        })
-    }
-
-    // 오디오 로드 완료
-    this.audioTarget.addEventListener('loadedmetadata', () => {
-      console.log("✅ Audio metadata loaded")
-      console.log("  Duration:", this.audioTarget.duration)
-      this.updateTotalTime()
-    })
-
-    // 오디오 로드 시작
-    this.audioTarget.addEventListener('loadstart', () => {
-      console.log("🔄 Audio load started")
-    })
-
-    // 오디오 로드 중 에러
-    this.audioTarget.addEventListener('error', (e) => {
-      console.error("❌ Audio load error:", e)
-      console.error("  Error code:", this.audioTarget.error?.code)
-      console.error("  Error message:", this.audioTarget.error?.message)
-    })
-
-    // 재생 종료
-    this.audioTarget.addEventListener('ended', () => {
-      console.log("⏹️ Audio playback ended")
-      this.isPlaying = false
-      this.updatePlayPauseIcon()
-      if (this.updateInterval) {
-        clearInterval(this.updateInterval)
-      }
-      this.resetProgress()
-    })
-
-    console.log("✅ Audio player connected:", this.urlValue)
+    this.isLoading = false
+    console.log("🎵 Audio player connected:", this.urlValue)
   }
 
   disconnect() {
-    if (this.hasAudioTarget) {
-      this.audioTarget.pause()
-    }
-
-    if (this.updateInterval) {
-      clearInterval(this.updateInterval)
-    }
+    this.stop()
   }
 
-  toggle() {
-    console.log("🔘 Toggle clicked, isPlaying:", this.isPlaying)
-    if (this.isPlaying) {
-      this.pause()
-    } else {
-      this.play()
-    }
-  }
-
+  // 재생
   async play() {
-    console.log("▶️ === Play 시작 ===")
-    console.log("  Audio src:", this.audioTarget.src)
-    console.log("  Audio readyState:", this.audioTarget.readyState)
-    console.log("  Audio paused:", this.audioTarget.paused)
-    console.log("  Audio currentTime:", this.audioTarget.currentTime)
-    console.log("  Audio duration:", this.audioTarget.duration)
+    if (this.isPlaying || this.isLoading) return
+
+    console.log("▶️ Attempting to play audio:", this.urlValue)
+    
+    // 다른 플레이어 중지
+    window.AudioManager.play(this)
+    
+    // 로딩 상태 시작
+    this.isLoading = true
+    this.updateButtons()
     
     try {
-      // 다른 재생 중인 오디오 모두 정지
-      document.querySelectorAll('audio').forEach(audio => {
-        if (audio !== this.audioTarget) {
-          audio.pause()
-        }
-      })
-
-      console.log("🎯 Calling audioTarget.play()...")
-      const playPromise = this.audioTarget.play()
-      console.log("  Play promise:", playPromise)
-      
-      await playPromise
-      
-      console.log("✅ Play succeeded!")
-      this.isPlaying = true
-      this.updatePlayPauseIcon()
-
-      // 진행 상황 업데이트 시작
-      this.updateInterval = setInterval(() => {
-        this.updateProgress()
-      }, 100)
+      // 재생 시작 (preload="none"이므로 자동으로 load됨)
+      await this.audioTarget.play()
+      // isPlaying은 playing 이벤트에서 true로 설정됨
     } catch (error) {
-      console.error("❌ === 오디오 재생 실패 ===")
-      console.error("  Error name:", error.name)
-      console.error("  Error message:", error.message)
-      console.error("  Error:", error)
+      console.error("❌ Play failed:", error)
+      this.isLoading = false
       this.isPlaying = false
-      this.updatePlayPauseIcon()
+      this.updateButtons()
+      alert("오디오 재생에 실패했습니다.")
     }
   }
 
-  pause() {
-    console.log("⏸️ Pause called")
-    this.audioTarget.pause()
-    this.isPlaying = false
-    this.updatePlayPauseIcon()
+  // 완전 중지 (currentTime 리셋)
+  stop() {
+    if (!this.isPlaying) return
 
-    if (this.updateInterval) {
-      clearInterval(this.updateInterval)
-    }
-  }
-
-  updatePlayPauseIcon() {
-    if (this.hasPlayIconTarget && this.hasPauseIconTarget) {
-      if (this.isPlaying) {
-        this.playIconTarget.classList.add("hidden")
-        this.pauseIconTarget.classList.remove("hidden")
-      } else {
-        this.playIconTarget.classList.remove("hidden")
-        this.pauseIconTarget.classList.add("hidden")
-      }
-    }
-  }
-
-  updateProgress() {
-    if (!this.hasAudioTarget) return
-
-    const currentTime = this.audioTarget.currentTime
-    const duration = this.audioTarget.duration
-
-    // 진행 바 업데이트
-    if (this.hasProgressTarget && duration) {
-      const progress = (currentTime / duration) * 100
-      this.progressTarget.style.width = `${progress}%`
-    }
-
-    // 현재 시간 업데이트
-    if (this.hasCurrentTimeTarget) {
-      this.currentTimeTarget.textContent = this.formatTime(currentTime)
-    }
-  }
-
-  updateTotalTime() {
-    if (this.hasTotalTimeTarget && this.audioTarget.duration) {
-      this.totalTimeTarget.textContent = this.formatTime(this.audioTarget.duration)
-    }
-  }
-
-  resetProgress() {
-    if (this.hasProgressTarget) {
-      this.progressTarget.style.width = "0%"
-    }
-
-    if (this.hasCurrentTimeTarget) {
-      this.currentTimeTarget.textContent = "0:00"
-    }
-
-    this.audioTarget.currentTime = 0
-  }
-
-  formatTime(seconds) {
-    if (isNaN(seconds)) return "0:00"
+    console.log("⏹️ Stopping audio:", this.urlValue)
     
-    const minutes = Math.floor(seconds / 60)
-    const secs = Math.floor(seconds % 60)
-    return `${minutes}:${secs.toString().padStart(2, '0')}`
+    this.audioTarget.pause()
+    this.audioTarget.currentTime = 0
+    this.isPlaying = false
+    this.isLoading = false
+    this.updateButtons()
+    
+    window.AudioManager.stop(this)
+  }
+
+  // 오디오 재생 종료 이벤트
+  handleEnded() {
+    console.log("✅ Audio ended:", this.urlValue)
+    this.isPlaying = false
+    this.isLoading = false
+    this.audioTarget.currentTime = 0
+    this.updateButtons()
+    window.AudioManager.stop(this)
+  }
+
+  // 로딩 시작
+  handleLoadStart() {
+    console.log("🔄 Loading started:", this.urlValue)
+    this.isLoading = true
+    this.updateButtons()
+  }
+
+  // 재생 가능 상태
+  handleCanPlay() {
+    console.log("✅ Can play:", this.urlValue)
+    // play() 함수에서 이미 처리하므로 여기서는 로그만
+  }
+
+  // 버퍼링 중 (재생 중 네트워크 대기)
+  handleWaiting() {
+    console.log("⏳ Waiting (buffering):", this.urlValue)
+    this.isLoading = true
+    this.updateButtons()
+  }
+
+  // 재생 중 (버퍼링 완료)
+  handlePlaying() {
+    console.log("▶️ Playing (buffering complete):", this.urlValue)
+    this.isPlaying = true
+    this.isLoading = false
+    this.updateButtons()
+  }
+
+  // 에러 처리
+  handleError(event) {
+    console.error("❌ Audio error:", event)
+    this.isLoading = false
+    this.isPlaying = false
+    this.updateButtons()
+  }
+
+  // 버튼 UI 업데이트
+  updateButtons() {
+    if (!this.hasPlayButtonTarget || !this.hasStopButtonTarget || !this.hasLoadingButtonTarget) return
+
+    // 모든 버튼 숨기기
+    this.playButtonTarget.classList.add("hidden")
+    this.stopButtonTarget.classList.add("hidden")
+    this.loadingButtonTarget.classList.add("hidden")
+
+    // 상태에 따라 버튼 표시
+    if (this.isLoading) {
+      this.loadingButtonTarget.classList.remove("hidden")
+    } else if (this.isPlaying) {
+      this.stopButtonTarget.classList.remove("hidden")
+    } else {
+      this.playButtonTarget.classList.remove("hidden")
+    }
   }
 }
-
