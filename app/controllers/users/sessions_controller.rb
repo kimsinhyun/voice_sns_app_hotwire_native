@@ -35,8 +35,7 @@ class Users::SessionsController < Devise::SessionsController
     # 자동 로그인
     sign_in(user)
 
-    # Turbo Native 앱으로 리다이렉트
-    redirect_to feed_path, allow_other_host: false
+    redirect_to root_path, allow_other_host: false
   end
 
   protected
