@@ -113,9 +113,9 @@ final class ButtonComponent: BridgeComponent {
 
 ## 구현 예제
 
-### 예제 1: 네이티브 버튼
+### 네이티브 버튼
 
-네비게이션 바에 네이티브 버튼을 표시하는 간단한 예제입니다.
+네비게이션 바에 네이티브 버튼을 표시하는 예제입니다.
 
 #### JavaScript (Stimulus)
 
@@ -125,25 +125,15 @@ import { BridgeComponent } from "@hotwired/hotwire-native-bridge"
 
 export default class extends BridgeComponent {
   static component = "button"
-  static values = { title: String, style: String }
 
   connect() {
     super.connect()
-    
-    // Native에게 버튼 표시 요청
-    this.send("connect", {
-      title: this.titleValue,
-      style: this.styleValue
-    }, () => {
-      // 사용자가 버튼 클릭 시 실행
-      this.performAction()
-    })
-  }
 
-  performAction() {
-    // 커스텀 이벤트 디스패치
-    const event = new CustomEvent("button:clicked", { bubbles: true })
-    this.element.dispatchEvent(event)
+    const element = this.bridgeElement
+    const title = element.bridgeAttribute("title")
+    this.send("connect", {title}, () => {
+      this.element.click()
+    })
   }
 }
 ```
@@ -157,36 +147,68 @@ import UIKit
 
 final class ButtonComponent: BridgeComponent {
     override class var name: String { "button" }
-    
-    private var barButtonItem: UIBarButtonItem?
-    
+
     override func onReceive(message: Message) {
-        switch message.event {
-        case "connect":
-            handleConnect(message: message)
-        case "disconnect":
-            handleDisconnect()
-        }
+        guard let viewController else { return }
+        addButton(via: message, to: viewController)
     }
-    
-    private func handleConnect(message: Message) {
-        guard let data: MessageData = message.data(),
-              let viewController = delegate.destination as? UIViewController else { return }
-        
-        // 네이티브 버튼 생성
-        let action = UIAction { [weak self] _ in
-            self?.reply(to: "connect")  // JavaScript callback 호출
-        }
-        
-        let button = UIBarButtonItem(title: data.title, primaryAction: action)
-        viewController.navigationItem.rightBarButtonItem = button
-        barButtonItem = button
+
+    private var viewController: UIViewController? {
+        delegate?.destination as? UIViewController
     }
-    
-    private struct MessageData: Decodable {
+
+    private func addButton(via message: Message, to viewController: UIViewController) {
+        guard let data: MessageData = message.data() else { return }
+
+        let action = UIAction { [unowned self] _ in
+            self.reply(to: "connect")
+        }
+        let item = UIBarButtonItem(title: data.title, primaryAction: action)
+        viewController.navigationItem.rightBarButtonItem = item
+    }
+}
+
+private extension ButtonComponent {
+    struct MessageData: Decodable {
         let title: String
-        let style: String?
     }
+}
+```
+
+#### Android (Kotlin)
+
+```kotlin
+class ButtonComponent(
+    name: String,
+    private val delegate: BridgeDelegate<HotwireDestination>
+) : BridgeComponent<HotwireDestination>(name, delegate) {
+
+    override fun onReceive(message: Message) {
+        // Handle incoming messages based on the message `event`.
+        when (message.event) {
+            "connect" -> handleConnectEvent(message)
+            else -> Log.w("ButtonComponent", "Unknown event for message: $message")
+        }
+    }
+
+    private fun handleConnectEvent(message: Message) {
+        val data = message.data<MessageData>() ?: return
+
+        // Write native code to display a native submit button in the
+        // toolbar displayed in the delegate.destination. Use the
+        // incoming data.title to set the button title.
+    }
+
+    private fun performButtonClick(): Boolean {
+        return replyTo("connect")
+    }
+
+    // Use kotlinx.serialization annotations to define a serializable
+    // data class that represents the incoming message.data json.
+    @Serializable
+    data class MessageData(
+        @SerialName("title") val title: String
+    )
 }
 ```
 
@@ -195,115 +217,18 @@ final class ButtonComponent: BridgeComponent {
 ```erb
 <!-- 네비게이션 바에 "저장" 버튼 추가 -->
 <div data-controller="bridge--button"
-     data-bridge--button-title-value="저장"
-     data-bridge--button-style-value="done"
-     data-action="button:clicked->form#submit">
+     data-bridge--button-title-value="저장">
   <!-- 폼 또는 콘텐츠 -->
 </div>
 ```
 
-**결과**:
-- ✅ iOS 네비게이션 바에 진짜 네이티브 버튼 표시
-
----
-
-### 예제 2: 음성 녹음
-
-OS의 마이크 기능을 사용하는 복잡한 예제입니다.
-
-#### JavaScript (Stimulus)
-
-```javascript
-export default class extends BridgeComponent {
-  static component = "audio-recorder"
-  
-  async startRecording() {
-    // Native에게 녹음 시작 요청
-    const result = await this.send("startRecording")
-    
-    if (result.success) {
-      this.isRecording = true
-      this.startTimer()  // UI만 JavaScript에서 관리
-    }
-  }
-  
-  async stopRecording() {
-    // Native에게 녹음 중지 요청
-    const result = await this.send("stopRecording")
-    
-    this.isRecording = false
-    this.recordedDuration = result.duration  // Native에서 받은 녹음 길이
-    this.showPreview()
-  }
-  
-  async submit() {
-    // Native에게 오디오 데이터 요청 (Base64)
-    const result = await this.send("getAudioData")
-    
-    // Rails 서버로 전송
-    const formData = new FormData()
-    formData.append('recording[audio_data]', result.audioData)
-    
-    await fetch('/recordings', { method: 'POST', body: formData })
-  }
-}
-```
-
-#### iOS (Swift)
-
-```swift
-final class AudioRecorderComponent: BridgeComponent {
-    override class var name: String { "audio-recorder" }
-    
-    private var audioRecorder: AVAudioRecorder?
-    private var recordingURL: URL?
-    
-    override func onReceive(message: Message) {
-        switch message.event {
-        case "startRecording": handleStartRecording()
-        case "stopRecording": handleStopRecording()
-        case "getAudioData": handleGetAudioData()
-        }
-    }
-    
-    private func handleStartRecording() {
-        // AVAudioRecorder로 네이티브 녹음
-        let fileURL = createTempURL()
-        audioRecorder = try? AVAudioRecorder(url: fileURL, settings: settings)
-        audioRecorder?.record()
-        
-        reply(to: "startRecording", with: ["success": true])
-    }
-    
-    private func handleStopRecording() {
-        let duration = audioRecorder?.currentTime ?? 0
-        audioRecorder?.stop()
-        
-        reply(to: "stopRecording", with: StopResponse(duration: duration))
-    }
-    
-    private func handleGetAudioData() {
-        // 오디오 파일을 Base64로 인코딩
-        let data = try? Data(contentsOf: recordingURL!)
-        let base64 = data?.base64EncodedString() ?? ""
-        
-        reply(to: "getAudioData", with: AudioDataResponse(audioData: base64))
-    }
-    
-    private struct StopResponse: Encodable {
-        let duration: TimeInterval
-    }
-    
-    private struct AudioDataResponse: Encodable {
-        let audioData: String
-    }
-}
-```
-
-**책임 분리**:
-- **JavaScript**: UI 상태 관리 (타이머, 진행바, 버튼 활성화)
-- **Native**: OS API 호출 (마이크 녹음, 파일 저장, Base64 인코딩)
-- **Rails**: 데이터 저장 (Base64 디코딩, Active Storage)
+**동작 방식**:
+1. HTML의 `data-bridge--button-title-value`가 Stimulus Controller로 전달
+2. Stimulus가 `this.send("connect", {title})` 호출로 Native에게 메시지 전송
+3. Native가 네이티브 버튼을 네비게이션 바에 추가
+4. 사용자가 버튼 클릭 시 Native가 `reply(to: "connect")` 호출
+5. Stimulus callback이 실행되어 `this.element.click()` 트리거
+6. HTML의 click 이벤트로 폼 제출 등의 액션 실행
 
 ---
 
@@ -407,11 +332,10 @@ const application = Application.start()
 - [iOS Bridge Components](https://native.hotwired.dev/ios/bridge-components)
 - [Android Bridge Components](https://native.hotwired.dev/android/bridge-components)
 - [HotwireNative.md](./HotwireNative.md) - 전체 Hotwire Native 가이드
-- [AudioRecordingBridge.md](./AudioRecordingBridge.md) - 음성 녹음 구현 가이드
 
 ---
 
 **작성일**: 2025-10-12  
-**최종 업데이트**: 2025-10-12  
+**최종 업데이트**: 2025-10-15  
 **상태**: ✅ 완료
 

@@ -28,7 +28,7 @@
 		<main class="flex-1 overflow-y-auto pt-4">
 			<%= yield %>
 		</main>
-		<div class="pd-safe">
+		<div style="margin-bottom: env(safe-area-inset-bottom);">
 			<%= render "shared/footer", submit_url: @submit_url  if @submit_url %>
 		</div>
 	</body>

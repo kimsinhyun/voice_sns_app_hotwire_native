@@ -27,6 +27,7 @@ export default class extends BridgeComponent {
     this.currentTime = 0
     this.recordedDuration = 0
     this.timerInterval = null
+    this.playbackTimer = null
     this.startTime = null
     
     console.log("✅ Compact Audio Recorder connected")
@@ -35,6 +36,7 @@ export default class extends BridgeComponent {
   
   disconnect() {
     this.stopTimer()
+    this.stopPlaybackTimer()
     super.disconnect()
   }
   
@@ -173,6 +175,11 @@ export default class extends BridgeComponent {
       this.isPlaying = true
       this.updatePlaybackUI()
       
+      // 재생 완료 타이머 시작 (recordedDuration 사용)
+      if (this.recordedDuration > 0) {
+        this.startPlaybackTimer()
+      }
+      
     } catch (error) {
       console.error("❌ Play audio failed:", error)
       alert("재생할 수 없습니다.")
@@ -187,10 +194,29 @@ export default class extends BridgeComponent {
       console.log("✅ Audio stopped, result:", result)
       
       this.isPlaying = false
+      this.stopPlaybackTimer()
       this.updatePlaybackUI()
       
     } catch (error) {
       console.error("❌ Stop audio failed:", error)
+    }
+  }
+  
+  startPlaybackTimer() {
+    this.stopPlaybackTimer()
+    
+    console.log(`⏱️ Starting playback timer for ${this.recordedDuration}s`)
+    
+    this.playbackTimer = setTimeout(() => {
+      console.log("🎵 Audio playback finished (via timer)")
+      this.handlePlaybackFinished()
+    }, this.recordedDuration * 1000)
+  }
+  
+  stopPlaybackTimer() {
+    if (this.playbackTimer) {
+      clearTimeout(this.playbackTimer)
+      this.playbackTimer = null
     }
   }
   
@@ -229,6 +255,14 @@ export default class extends BridgeComponent {
     
     // 재생 상태 초기화
     this.isPlaying = false
+    this.updatePlaybackUI()
+  }
+  
+  // 재생 완료 처리 (타이머에서 호출됨)
+  handlePlaybackFinished() {
+    console.log("🎵 Audio playback finished")
+    this.isPlaying = false
+    this.stopPlaybackTimer()
     this.updatePlaybackUI()
   }
   
