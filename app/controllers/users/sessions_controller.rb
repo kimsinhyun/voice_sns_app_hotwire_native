@@ -26,8 +26,7 @@ class Users::SessionsController < Devise::SessionsController
     device_id = params[:device_id]
 
     if device_id.blank?
-      render json: { error: "device_id is required" }, status: :bad_request
-      return
+      redirect_to feed_path
     end
 
     # device_id로 사용자 찾기 또는 생성

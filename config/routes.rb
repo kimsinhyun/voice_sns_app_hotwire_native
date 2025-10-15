@@ -38,9 +38,4 @@ Rails.application.routes.draw do
 
   # Health check
   get "up" => "rails/health#show", as: :rails_health_check
-
-  # # Catch-all route (but exclude Rails internal paths like Active Storage)
-  # match "*path", to: redirect("/"), via: :all, constraints: lambda { |req|
-  #   !req.path.start_with?('/rails/')
-  # }
 end
