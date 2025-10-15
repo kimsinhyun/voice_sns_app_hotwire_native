@@ -135,12 +135,6 @@ class AudioRecorderComponent(
                 setDataSource(recordingFile!!.absolutePath)
                 prepare()
                 start()
-
-                // 재생 완료 리스너
-                setOnCompletionListener {
-                    Log.d(TAG, "🎵 Audio playback finished")
-                    replyTo("playAudio", PlaybackFinishedResponse(true))
-                }
             }
 
             Log.d(TAG, "✅ Audio playing, duration: ${mediaPlayer?.duration?.div(1000.0)}s")
@@ -215,8 +209,5 @@ class AudioRecorderComponent(
     
     @Serializable
     data class AudioDataResponse(val audioData: String)
-    
-    @Serializable
-    data class PlaybackFinishedResponse(val finished: Boolean)
 }
 
