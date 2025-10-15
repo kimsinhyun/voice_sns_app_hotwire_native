@@ -2,7 +2,9 @@
 <div data-controller="bridge--compact-audio-recorder"
 		 data-bridge--compact-audio-recorder-submit-url-value="<%= submit_url %>"
 		 data-bridge--compact-audio-recorder-max-duration-value="<%= defined?(max_duration) ? max_duration : 10 %>"
-		 class=" z-50 bg-[#E5DDD5] shadow-lg">
+		 class=" z-50 bg-[#E5DDD5] scratch"
+		 style="--texture-offset-x: -20%; --texture-offset-y: -30%; --texture-image: url('<%= asset_path('textured-paper-footer.png') %>');"
+>
 
 	<div class="relative flex items-center justify-between px-4 py-3">
 		<!-- 미리듣기 버튼 (조건부 표시) - 왼쪽 -->

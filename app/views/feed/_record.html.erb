@@ -4,8 +4,8 @@
   offset_x = (random_seed * 37) % 100  # 0-100% 사이
   offset_y = (random_seed * 73) % 100  # 0-100% 사이
 %>
-<div class="bg-white/70 backdrop-blur-sm rounded-2xl shadow-md p-4 mb-3 border border-white/50 scratch" 
-     style="--texture-offset-x: -<%= offset_x %>%; --texture-offset-y: -<%= offset_y %>%;"
+<div class="bg-white/70 backdrop-blur-sm rounded-2xl shadow-md p-4 mb-3 border border-white/50 scratch"
+     style="--texture-offset-x: -<%= offset_x %>%; --texture-offset-y: -<%= offset_y %>%; --texture-image: url('<%= asset_path('paper_texture.jpeg') %>');"
      data-controller="audio-player"
      data-audio-player-url-value="<%= rails_blob_path(recording.audio_file) %>">
   

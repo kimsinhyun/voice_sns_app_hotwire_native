@@ -79,7 +79,8 @@
     height: 200%;
     pointer-events: none;
     z-index: 0;
-    background-image: url('paper_texture.jpeg');
+      /*background-image: url('paper_texture.jpeg');*/
+    background-image: var(--texture-image, url('paper_texture.jpeg'));
     background-size: 300px 300px;
     background-repeat: repeat;
     background-blend-mode: soft-light;
