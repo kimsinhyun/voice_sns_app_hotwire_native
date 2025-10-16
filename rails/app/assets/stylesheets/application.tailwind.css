@@ -2,19 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  html {
-    height: -webkit-fill-available;
-  }
+/*@layer base {*/
+/*  html {*/
+/*    height: -webkit-fill-available;*/
+/*  }*/
 
-  body {
-    height: -webkit-fill-available;
-  }
+/*  body {*/
+/*    height: -webkit-fill-available;*/
+/*  }*/
 
-  #root {
-    height: -webkit-fill-available;
-  }
-}
+/*  #root {*/
+/*    height: -webkit-fill-available;*/
+/*  }*/
+/*}*/
 
 @layer utilities {
   /* Safe Area Inset 유틸리티 */

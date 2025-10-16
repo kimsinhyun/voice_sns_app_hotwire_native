@@ -5,7 +5,7 @@
 		 data-bridge--navigation-bar-hidden-value="true"
 		 class="hidden"></div>
 
-<div class="relative" data-controller="pull-to-refresh">
+<div class="relative flex flex-col h-full" data-controller="pull-to-refresh">
 	<!-- Pull to refresh 스피너 -->
 	<div data-pull-to-refresh-target="spinner" 
 	     class="fixed top-0 left-1/2 -translate-x-1/2 z-50 
@@ -20,9 +20,9 @@
 	
 	<!-- 스크롤 가능한 컨테이너 -->
 	<div data-pull-to-refresh-target="container" 
-	     class="container overflow-y-auto">
+	     class="flex-1 overflow-y-auto">
 		<!-- 메인 콘텐츠 - 상단 safe area, 하단 recorder 높이만큼 패딩 (탭은 safe-area로 처리) -->
-		<div class="px-4 py-4 pt-safe-or-4 pb-[88px]">
+		<div class="px-4 py-4 pt-safe-or-4">
 			<% if @recordings&.any? %>
 				<!-- 녹음 목록 -->
 				<div id="recordings_list" 
