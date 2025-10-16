@@ -1,0 +1,100 @@
+---
+alwaysApply: true
+description: Ruby on Rails + Hotwire 네이티브 앱 개발 가이드라인
+---
+
+# 프로젝트 개발 가이드라인
+
+## 언어 및 응답
+- 모든 응답은 **한글**로 작성합니다.
+
+## 기술 스택
+- Ruby on Rails + Hotwire Native 기반 네이티브 앱을 개발 중입니다.
+- 사용자 페이지는 **모바일 뷰**에 맞게 개발되어야 합니다 (admin 페이지는 예외).
+- TailwindCSS를 사용하여 반응형 디자인을 구현합니다.
+
+## View 개발 원칙
+- Rails에서는 **Hotwire + TailwindCSS** 기반으로 화면을 구성합니다.
+- 최대한 많은 view 기능들은 **Ruby 및 Turbo** 기반으로 동작되어야 합니다.
+- **Stimulus (JavaScript)** 는 최소한의 책임만 가져가도록 합니다.
+- Server-side rendering과 Hotwire를 우선적으로 활용합니다.
+- 스타일링은 TailwindCSS 유틸리티 클래스를 사용하여 구현합니다.
+
+## 네이티브 앱 스타일링 원칙
+- **vh 대신 dvh(Dynamic Viewport Height) 사용**: 모바일 브라우저의 동적 UI(주소창 등)에 맞춰 실시간으로 조정되어 네이티브 앱처럼 보입니다.
+- 스크롤바는 완전히 숨김 처리되어 있습니다.
+- Safe Area를 고려한 레이아웃을 구성합니다.
+
+## Linting
+- Stimulus의 linter 오류는 IDE 버그이므로 신경쓰지 않습니다.
+
+## Hotwire Native 개발 원칙
+
+### Bridge Component
+
+Bridge Component는 **JavaScript(Stimulus)와 Native(Swift/Kotlin) 간 양방향 통신 채널**입니다.
+
+**통신 흐름:**
+```
+HTML → Stimulus Controller
+  ↓ this.send(event, data)
+Native Component (onReceive)
+  ↓ OS API 호출
+Native → reply(to: event, with: data)
+  ↓
+Stimulus callback 실행
+```
+
+**예제:**
+```javascript
+// JavaScript → Native
+await this.send("startRecording", {})
+
+// Native → JavaScript  
+reply(to: "startRecording", with: ["duration": 10.0])
+```
+
+**접근 가능한 OS API:**
+- UI (네비게이션 바, 액션 시트)
+- 미디어 (AVFoundation 녹음/재생)
+- 하드웨어 (카메라, 마이크, GPS)
+- 시스템 (푸시 알림, 권한 관리)
+
+### Rails 중심 개발 (Rails-First Development)
+- **최대한 많은 로직을 Rails에서 처리**합니다.
+- 네이티브 코드(Swift)는 최소화하되, 필요한 경우 Bridge Component로 OS API에 접근합니다.
+- 비즈니스 로직, 데이터 처리, 라우팅은 모두 Rails에서 관리합니다.
+- 네이티브 앱처럼 보이지만 Rails로 제어되는 구조를 유지합니다.
+
+### Bridge Component 재사용성
+- Bridge Component는 **범용적이고 재사용 가능**하게 설계합니다.
+- 특정 화면에 종속되지 않도록 추상화 수준을 높입니다.
+
+**예시:**
+```javascript
+// ✅ 범용적
+data-controller="bridge--button"
+data-bridge--button-title-value="저장"
+
+// ❌ 특정 화면 종속
+data-controller="bridge--save-profile-button"
+```
+
+## 프로젝트 구조
+
+**Rails** (`voice_talk_rails`):
+- 비즈니스 로직, 데이터 처리, UI 렌더링
+- Bridge Components (Stimulus): `app/javascript/controllers/bridge/`
+- 문서: `docs/BridgeComponent.md`, `docs/HotwireNative.md`
+
+**iOS** (`voice_talk_ios`):
+- Rails 화면 렌더링 (Hotwire Native)
+- Bridge Components (Swift): `voice_talk_ios/Bridge/`
+- Path Configuration: `path-configuration.json`
+
+## 참고 문서
+
+- **[docs/BridgeComponent.md](mdc:voice_talk_rails/docs/BridgeComponent.md)**: Bridge Component 완전 가이드
+- **[docs/HotwireNative.md](mdc:voice_talk_rails/docs/HotwireNative.md)**: Hotwire Native 개요
+- **[docs/AudioRecordingBridge.md](mdc:voice_talk_rails/docs/AudioRecordingBridge.md)**: 음성 녹음 구현
+
