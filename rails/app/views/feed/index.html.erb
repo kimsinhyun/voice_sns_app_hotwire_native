@@ -1,25 +1,43 @@
+<%= turbo_refreshes_with method: :morph, scroll: :preserve %>
+
 <!-- Navigation bar를 숨기는 Bridge Component -->
 <div data-controller="bridge--navigation-bar"
 		 data-bridge--navigation-bar-hidden-value="true"
 		 class="hidden"></div>
 
-<div class="container overflow-y-auto">
-	<!-- 메인 콘텐츠 - 상단 safe area, 하단 recorder 높이만큼 패딩 (탭은 safe-area로 처리) -->
-	<div class="px-4 py-4 pt-safe-or-4 pb-[88px]">
-		<% if @recordings&.any? %>
-			<!-- 녹음 목록 -->
-			<div id="recordings_list" 
-			     class="space-y-3"
-			     data-latest-recording-id="<%= @recordings.first&.id || 0 %>">
-				<%= render partial: "feed/record", collection: @recordings, as: :recording %>
-			</div>
-		<% else %>
-			<div id="recordings_list" 
-			     class="space-y-3"
-			     data-latest-recording-id="0">
-				<p class="text-gray-500 text-center py-8">아직 녹음이 없습니다</p>
-			</div>
-		<% end %>
+<div class="relative" data-controller="pull-to-refresh">
+	<!-- Pull to refresh 스피너 -->
+	<div data-pull-to-refresh-target="spinner" 
+	     class="fixed top-0 left-1/2 -translate-x-1/2 z-50 
+	            opacity-0 transition-all duration-300 pointer-events-none">
+		<svg class="w-8 h-8 text-blue-500" fill="none" viewBox="0 0 24 24">
+			<circle class="opacity-25" cx="12" cy="12" r="10" 
+			        stroke="currentColor" stroke-width="4"></circle>
+			<path class="opacity-75" fill="currentColor" 
+			      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+		</svg>
+	</div>
+	
+	<!-- 스크롤 가능한 컨테이너 -->
+	<div data-pull-to-refresh-target="container" 
+	     class="container overflow-y-auto">
+		<!-- 메인 콘텐츠 - 상단 safe area, 하단 recorder 높이만큼 패딩 (탭은 safe-area로 처리) -->
+		<div class="px-4 py-4 pt-safe-or-4 pb-[88px]">
+			<% if @recordings&.any? %>
+				<!-- 녹음 목록 -->
+				<div id="recordings_list" 
+				     class="space-y-3"
+				     data-latest-recording-id="<%= @recordings.first&.id || 0 %>">
+					<%= render partial: "feed/record", collection: @recordings, as: :recording %>
+				</div>
+			<% else %>
+				<div id="recordings_list" 
+				     class="space-y-3"
+				     data-latest-recording-id="0">
+					<p class="text-gray-500 text-center py-8">아직 녹음이 없습니다</p>
+				</div>
+			<% end %>
+		</div>
 	</div>
 </div>
 

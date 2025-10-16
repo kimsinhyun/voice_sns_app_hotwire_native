@@ -29,7 +29,11 @@ Rails.application.routes.draw do
 
   # Feed routes
   # get "feed", to: "feed#index"
-  resources :feed, only: [ :index ]
+  resources :feed, only: [ :index ] do
+    collection do
+      get :refresh
+    end
+  end
   resources :messages, only: [ :index ]
   resources :settings, only: [ :index ]
 
