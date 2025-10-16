@@ -5,7 +5,7 @@
 		 data-bridge--navigation-bar-hidden-value="true"
 		 class="hidden"></div>
 
-<div class="relative flex flex-col h-full" data-controller="pull-to-refresh">
+<div class="relative flex flex-col h-full" data-controller="pull-to-refresh infinite-scroll">
 	<!-- Pull to refresh 스피너 -->
 	<div data-pull-to-refresh-target="spinner" 
 	     class="fixed top-0 left-1/2 -translate-x-1/2 z-50 
@@ -30,6 +30,16 @@
 				     data-latest-recording-id="<%= @recordings.first&.id || 0 %>">
 					<%= render partial: "feed/record", collection: @recordings, as: :recording %>
 				</div>
+				
+				<!-- 스켈레톤 로더 컨테이너 -->
+				<div id="skeleton_loader" class="hidden mt-3">
+					<%= render partial: "shared/recording_skeleton" %>
+				</div>
+				
+				<!-- Infinite Scroll Sentinel (감시 요소) -->
+				<div id="infinite_scroll_sentinel" 
+				     data-infinite-scroll-target="sentinel"
+				     class="h-4 w-full"></div>
 			<% else %>
 				<div id="recordings_list" 
 				     class="space-y-3"

@@ -32,6 +32,7 @@ Rails.application.routes.draw do
   resources :feed, only: [ :index ] do
     collection do
       get :refresh
+      get :load_more
     end
   end
   resources :messages, only: [ :index ]

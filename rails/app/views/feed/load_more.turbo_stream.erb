@@ -1,0 +1,23 @@
+<% if @recordings.any? %>
+  <%# 새 recordings를 목록 끝에 추가 %>
+  <%= turbo_stream.append "recordings_list" do %>
+    <%= render partial: "feed/record", collection: @recordings, as: :recording %>
+  <% end %>
+<% end %>
+
+<%# 스켈레톤 UI 제거 %>
+<%= turbo_stream.update "skeleton_loader" do %>
+  <!-- 스켈레톤 제거됨 -->
+<% end %>
+
+<% unless @has_more %>
+  <%# 더 이상 데이터가 없으면 sentinel 제거하고 controller에 알림 %>
+  <%= turbo_stream.remove "infinite_scroll_sentinel" %>
+  
+  <%#= turbo_stream.append "recordings_list" do %>
+<!--    <div class="text-center py-8 text-gray-400 text-sm">-->
+<!--      모든 녹음을 불러왔습니다-->
+<!--    </div>-->
+  <%# end %>
+<% end %>
+
