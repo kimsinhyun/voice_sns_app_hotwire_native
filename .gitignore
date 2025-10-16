@@ -36,3 +36,5 @@ voice_chat_app_backup_*
 
 # Git archives
 .git_archives/
+
+**/.idea/
