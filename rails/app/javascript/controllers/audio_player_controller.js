@@ -45,7 +45,14 @@ export default class extends Controller {
     window.AudioManager.play(this)
     
     try {
-      // 재생 시작 (preload="none"이므로 자동으로 load됨)
+      // preload="none"이고 동적으로 삽입된 경우, load()를 명시적으로 호출
+      // 이렇게 하지 않으면 브라우저가 source를 인식하지 못할 수 있음
+      if (this.audioTarget.readyState === 0) {
+        console.log("🔄 Loading audio source explicitly...")
+        this.audioTarget.load()
+      }
+      
+      // 재생 시작
       await this.audioTarget.play()
       // isPlaying은 playing 이벤트에서 true로 설정됨
     } catch (error) {

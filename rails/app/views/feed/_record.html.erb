@@ -13,7 +13,7 @@
 			 style="--texture-offset-x: -<%= offset_x %>%; --texture-offset-y: -<%= offset_y %>%; --texture-image: url('<%= asset_path('paper_texture.jpeg') %>');"
 			 data-controller="audio-player"
 			 data-recording-id="<%= recording.id %>"
-			 data-audio-player-url-value="<%= rails_blob_path(recording.audio_file) %>">
+			 data-audio-player-url-value="<%= rails_blob_url(recording.audio_file) %>">
 
 		<!-- 숨겨진 audio 태그 -->
 		<audio
@@ -25,7 +25,7 @@
                  ended->audio-player#handleEnded
                  error->audio-player#handleError"
 			preload="none">
-			<source src="<%= rails_blob_path(recording.audio_file) %>"
+			<source src="<%= rails_blob_url(recording.audio_file) %>"
 							type="<%= recording.audio_file.content_type %>">
 		</audio>
 
