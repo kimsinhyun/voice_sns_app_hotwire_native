@@ -18,13 +18,11 @@
 		<!-- 숨겨진 audio 태그 -->
 		<audio
 			data-audio-player-target="audio"
-			data-action="loadstart->audio-player#handleLoadStart
-                 canplay->audio-player#handleCanPlay
-                 playing->audio-player#handlePlaying
+			data-action="playing->audio-player#handlePlaying
                  waiting->audio-player#handleWaiting
                  ended->audio-player#handleEnded
                  error->audio-player#handleError"
-			preload="none">
+			preload="auto">
 			<source src="<%= rails_blob_url(recording.audio_file) %>"
 							type="<%= recording.audio_file.content_type %>">
 		</audio>

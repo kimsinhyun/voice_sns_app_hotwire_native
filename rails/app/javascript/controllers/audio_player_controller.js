@@ -38,21 +38,13 @@ export default class extends Controller {
   // 재생
   async play() {
     if (this.isPlaying || this.isLoading) return
-
-    console.log("▶️ Attempting to play audio:", this.urlValue)
     
     // 다른 플레이어 중지
     window.AudioManager.play(this)
+    this.isLoading = true
+    this.updateButtons()
     
     try {
-      // preload="none"이고 동적으로 삽입된 경우, load()를 명시적으로 호출
-      // 이렇게 하지 않으면 브라우저가 source를 인식하지 못할 수 있음
-      if (this.audioTarget.readyState === 0) {
-        console.log("🔄 Loading audio source explicitly...")
-        this.audioTarget.load()
-      }
-      
-      // 재생 시작
       await this.audioTarget.play()
       // isPlaying은 playing 이벤트에서 true로 설정됨
     } catch (error) {
@@ -60,7 +52,6 @@ export default class extends Controller {
       this.isLoading = false
       this.isPlaying = false
       this.updateButtons()
-      alert("오디오 재생에 실패했습니다.")
     }
   }
 
@@ -81,7 +72,6 @@ export default class extends Controller {
 
   // 오디오 재생 종료 이벤트
   handleEnded() {
-    console.log("✅ Audio ended:", this.urlValue)
     this.isPlaying = false
     this.isLoading = false
     this.audioTarget.currentTime = 0
@@ -89,28 +79,14 @@ export default class extends Controller {
     window.AudioManager.stop(this)
   }
 
-  // 로딩 시작 (첫 재생 시 로딩 스피너 표시 안 함)
-  handleLoadStart() {
-    console.log("🔄 Loading started:", this.urlValue)
-    // 첫 로드 시에는 재생 버튼 유지 - 로딩 상태 설정하지 않음
-  }
-
-  // 재생 가능 상태
-  handleCanPlay() {
-    console.log("✅ Can play:", this.urlValue)
-    // play() 함수에서 이미 처리하므로 여기서는 로그만
-  }
-
   // 버퍼링 중 (재생 중 네트워크 대기)
   handleWaiting() {
-    console.log("⏳ Waiting (buffering):", this.urlValue)
     this.isLoading = true
     this.updateButtons()
   }
 
   // 재생 중 (버퍼링 완료)
   handlePlaying() {
-    console.log("▶️ Playing (buffering complete):", this.urlValue)
     this.isPlaying = true
     this.isLoading = false
     this.updateButtons()
