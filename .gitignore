@@ -1,0 +1,35 @@
+# Rails
+/rails/log/*
+/rails/tmp/*
+/rails/storage/*
+!/rails/log/.keep
+!/rails/tmp/.keep
+!/rails/storage/.keep
+/rails/vendor/bundle
+/rails/node_modules
+
+# iOS
+ios/**/*.xcuserdata
+ios/**/*.xcworkspace/xcuserdata
+ios/Pods/
+ios/build/
+ios/DerivedData/
+
+# Android
+android/.gradle
+android/local.properties
+android/.idea/workspace.xml
+android/.idea/libraries
+android/build/
+android/app/build/
+android/captures/
+
+# macOS
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
+
+# Backup
+voice_chat_app_backup_*
