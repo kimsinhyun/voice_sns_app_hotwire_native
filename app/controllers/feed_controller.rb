@@ -4,7 +4,7 @@ class FeedController < ApplicationController
   def index
     @recordings = Recording.includes(
       :user, audio_file_attachment: :blob
-    ).all.order(created_at: :desc)
+    ).all.order(id: :desc)
 
     @submit_url = recordings_path
   end

@@ -6,7 +6,7 @@ export default class extends BridgeComponent {
   
   // Stimulus Targets
   static targets = [
-    "form", "audioDataInput",
+    "form", "audioDataInput", "lastSeenIdInput",
     "recordButton", "recordProgress",
     "playbackButton", "playIcon", "stopIcon",
     "submitButton"
@@ -246,11 +246,6 @@ export default class extends BridgeComponent {
       return
     }
     
-    if (this.hasSubmitButtonTarget) {
-      this.submitButtonTarget.disabled = true
-      this.submitButtonTarget.classList.add("opacity-50")
-    }
-    
     console.log("📤 Requesting audio data from native...")
     
     // Native에서 Base64 데이터 가져오기
@@ -261,21 +256,26 @@ export default class extends BridgeComponent {
       if (!result?.data?.audioData) {
         console.error("❌ No audioData in result:", result)
         alert("업로드 중 오류가 발생했습니다: No audio data received from native")
-        
-        if (this.hasSubmitButtonTarget) {
-          this.submitButtonTarget.disabled = false
-          this.submitButtonTarget.classList.remove("opacity-50")
-        }
         return
       }
       
       const audioData = result.data.audioData
       console.log("✅ Audio data received:", audioData.length, "chars")
       
-      // hidden field에 값 설정
-      this.audioDataInputTarget.value = audioData
+      // last_seen_id 설정 - DOM에서 직접 최신 recording ID 읽기
+      const recordingsList = document.getElementById("recordings_list")
+      const firstRecording = recordingsList?.querySelector('[data-recording-id]')
+      const lastSeenId = firstRecording?.dataset.recordingId || recordingsList?.dataset.latestRecordingId || 0
+      console.log("📊 Last seen recording ID:", lastSeenId)
       
-      // Rails form으로 제출 (Rails가 CSRF, redirect 등 처리)
+      // hidden fields에 값 설정
+      this.audioDataInputTarget.value = audioData
+      if (this.hasLastSeenIdInputTarget) {
+        this.lastSeenIdInputTarget.value = lastSeenId
+      }
+      
+      // Rails form으로 제출
+      // Turbo가 자동으로 처리하고, 서버가 footer를 replace하여 상태 초기화
       this.formTarget.requestSubmit()
     })
   }

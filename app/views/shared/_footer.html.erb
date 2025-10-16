@@ -1,18 +1,21 @@
-<%= render partial: "shared/request_idfv_bridge" %>
-<!-- 컴팩트 녹음 툴바 Partial -->
-<%= form_with(
-  url: submit_url,
-  method: :post,
-  data: { 
-    controller: "bridge--audio-recorder",
-    bridge__audio_recorder_target: "form",
-    bridge__audio_recorder_submit_url_value: submit_url,
-    bridge__audio_recorder_max_duration_value: (defined?(max_duration) ? max_duration : 10)
-  },
-  class: "z-50 bg-[#E5DDD5] scratch",
-  style: "--texture-offset-x: -20%; --texture-offset-y: -30%; --texture-image: url('#{asset_path('textured-paper-footer.png')}');"
-) do |form| %>
+<div id="recording_footer">
+  <%= render partial: "shared/request_idfv_bridge" %>
+  <!-- 컴팩트 녹음 툴바 Partial -->
+  <%= form_with(
+    url: submit_url,
+    method: :post,
+    data: { 
+      turbo: true,
+      controller: "bridge--audio-recorder",
+      bridge__audio_recorder_target: "form",
+      bridge__audio_recorder_submit_url_value: submit_url,
+      bridge__audio_recorder_max_duration_value: (defined?(max_duration) ? max_duration : 10)
+    },
+    class: "z-50 bg-[#E5DDD5] scratch",
+    style: "--texture-offset-x: -20%; --texture-offset-y: -30%; --texture-image: url('#{asset_path('textured-paper-footer.png')}');"
+  ) do |form| %>
   <%= form.hidden_field :audio_data, data: { bridge__audio_recorder_target: "audioDataInput" } %>
+  <%= form.hidden_field :last_seen_id, data: { bridge__audio_recorder_target: "lastSeenIdInput" } %>
 
 	<div class="relative flex items-center justify-between px-4 py-3">
 		<!-- 미리듣기 버튼 (조건부 표시) - 왼쪽 -->
@@ -50,4 +53,4 @@
 		</button>
 	</div>
 <% end %>
-
+</div>
