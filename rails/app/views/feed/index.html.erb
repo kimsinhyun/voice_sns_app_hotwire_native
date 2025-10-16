@@ -11,9 +11,7 @@
 			<div id="recordings_list" 
 			     class="space-y-3"
 			     data-latest-recording-id="<%= @recordings.first&.id || 0 %>">
-				<% @recordings.each do |recording| %>
-					<%= render partial: "feed/record", locals: { recording: recording, animate: false } if recording.audio_file.attached? %>
-				<% end %>
+				<%= render partial: "feed/record", collection: @recordings, as: :recording %>
 			</div>
 		<% else %>
 			<div id="recordings_list" 
