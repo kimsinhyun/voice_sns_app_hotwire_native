@@ -44,10 +44,6 @@ export default class extends Controller {
     // 다른 플레이어 중지
     window.AudioManager.play(this)
     
-    // 로딩 상태 시작
-    this.isLoading = true
-    this.updateButtons()
-    
     try {
       // 재생 시작 (preload="none"이므로 자동으로 load됨)
       await this.audioTarget.play()
@@ -86,11 +82,10 @@ export default class extends Controller {
     window.AudioManager.stop(this)
   }
 
-  // 로딩 시작
+  // 로딩 시작 (첫 재생 시 로딩 스피너 표시 안 함)
   handleLoadStart() {
     console.log("🔄 Loading started:", this.urlValue)
-    this.isLoading = true
-    this.updateButtons()
+    // 첫 로드 시에는 재생 버튼 유지 - 로딩 상태 설정하지 않음
   }
 
   // 재생 가능 상태

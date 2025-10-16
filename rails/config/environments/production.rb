@@ -23,6 +23,9 @@ Rails.application.configure do
 
   # Store uploaded files on the local file system (see config/storage.yml for options).
   config.active_storage.service = :local
+  
+  # Active Storage 파일 URL 만료 시간 (브라우저 캐싱 최적화)
+  config.active_storage.service_urls_expire_in = 1.hour
 
   # Assume all access to the app is happening through a SSL-terminating reverse proxy.
   config.assume_ssl = true

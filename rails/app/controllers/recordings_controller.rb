@@ -54,22 +54,34 @@ class RecordingsController < ApplicationController
     audio_data = Base64.decode64(base64_data)
     Rails.logger.info "📦 Decoded: #{audio_data.bytesize} bytes"
 
-    # Tempfile 생성
-    tempfile = Tempfile.new(["recording", ".mp3"])
-    tempfile.binmode
-    tempfile.write(audio_data)
-    tempfile.rewind
+    # 원본 파일 생성
+    original_file = Tempfile.new(["recording_original", ".mp3"])
+    original_file.binmode
+    original_file.write(audio_data)
+    original_file.rewind
+    original_file.close  # ffmpeg가 파일에 접근하기 위해 닫기
+
+    # 압축된 파일 생성
+    compressed_file = Tempfile.new(["recording_compressed", ".mp3"])
+    compressed_file.close  # ffmpeg가 파일을 생성하므로 닫기
+
+    # 오디오 압축 시도
+    compression_success = Recording.compress_audio_file(original_file.path, compressed_file.path)
+
+    # 압축 성공 시 압축 파일 사용, 실패 시 원본 사용
+    final_file_path = compression_success ? compressed_file.path : original_file.path
+    final_filename = compression_success ? "recording_compressed.mp3" : "recording.mp3"
 
     # Active Storage에 attach
     recording.audio_file.attach(
-      io: tempfile,
-      filename: "recording.mp3",
-      content_type: "audio/mp3"
+      io: File.open(final_file_path),
+      filename: final_filename,
+      content_type: "audio/mpeg"
     )
 
-    Rails.logger.info "✅ Base64 audio attached successfully"
+    Rails.logger.info "✅ Audio attached successfully (compressed: #{compression_success})"
   ensure
-    tempfile&.close
-    tempfile&.unlink
+    original_file&.unlink
+    compressed_file&.unlink
   end
 end
