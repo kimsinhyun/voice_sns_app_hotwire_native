@@ -1,0 +1,82 @@
+<% 
+  # 각 카드마다 다른 텍스처 위치를 위한 랜덤 offset (recording.id 기반으로 일관성 유지)
+  random_seed = recording.id || rand(1000)
+  offset_x = (random_seed * 37) % 100  # 0-100% 사이
+  offset_y = (random_seed * 73) % 100  # 0-100% 사이
+  
+  # 애니메이션 클래스 조건부 추가 (Turbo Stream으로 prepend될 때만)
+  base_classes = "bg-white/70 backdrop-blur-sm rounded-2xl shadow-md p-4 mb-3 border border-white/50 scratch"
+  card_classes = local_assigns[:animate] ? "recording-card-enter #{base_classes}" : base_classes
+%>
+<div class="<%= card_classes %>"
+     style="--texture-offset-x: -<%= offset_x %>%; --texture-offset-y: -<%= offset_y %>%; --texture-image: url('<%= asset_path('paper_texture.jpeg') %>');"
+     data-controller="audio-player"
+     data-recording-id="<%= recording.id %>"
+     data-audio-player-url-value="<%= rails_blob_path(recording.audio_file) %>">
+  
+  <!-- 숨겨진 audio 태그 -->
+  <audio 
+    data-audio-player-target="audio"
+    data-action="loadstart->audio-player#handleLoadStart
+                 canplay->audio-player#handleCanPlay
+                 playing->audio-player#handlePlaying
+                 waiting->audio-player#handleWaiting
+                 ended->audio-player#handleEnded
+                 error->audio-player#handleError"
+    preload="none">
+    <source src="<%= rails_blob_path(recording.audio_file) %>" 
+            type="<%= recording.audio_file.content_type %>">
+  </audio>
+
+  <div class="flex items-center gap-4">
+    <!-- 재생/로딩/중지 버튼 -->
+    <div class="flex-shrink-0 relative">
+      <!-- 재생 버튼 -->
+      <button 
+        data-audio-player-target="playButton"
+        data-action="click->audio-player#play"
+        class="w-14 h-14 rounded-full bg-blue-500 hover:bg-blue-600 active:bg-blue-700
+               flex items-center justify-center text-white 
+               transition-colors shadow-md">
+        <svg class="w-6 h-6 ml-1" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M8 5v14l11-7z"/>
+        </svg>
+      </button>
+      
+      <!-- 로딩 버튼 (스피너) -->
+      <button 
+        data-audio-player-target="loadingButton"
+        class="hidden w-14 h-14 rounded-full bg-blue-400
+               flex items-center justify-center text-white 
+               shadow-md cursor-wait"
+        disabled>
+        <svg class="w-6 h-6 animate-spin" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+      </button>
+      
+      <!-- 중지 버튼 -->
+      <button 
+        data-audio-player-target="stopButton"
+        data-action="click->audio-player#stop"
+        class="hidden w-14 h-14 rounded-full bg-red-500 hover:bg-red-600 active:bg-red-700
+               flex items-center justify-center text-white 
+               transition-colors shadow-md">
+        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+          <rect x="6" y="6" width="12" height="12"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- 오디오 정보 -->
+    <div class="flex-1 min-w-0">
+      <div class="text-base font-medium text-gray-900 truncate">
+        <%= recording.audio_file.filename %>
+      </div>
+      <div class="text-sm text-gray-500 mt-1">
+        <%= "#{recording.id}: #{number_to_human_size(recording.audio_file.byte_size)}" %>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,101 @@
+<div class="min-h-screen bg-gradient-to-b from-[#FFF5E9] to-[#FDEBD0] flex items-center justify-center p-4">
+  <div class="w-full max-w-md">
+    <!-- 로고/아이콘 영역 -->
+    <div class="text-center mb-8">
+      <div class="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-gradient-to-br from-[#FDEBD0] to-[#FFF5E9] shadow-lg mb-4">
+        <svg class="w-12 h-12 text-[#F5A08D]" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+          <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+        </svg>
+      </div>
+      <h1 class="text-3xl font-bold text-gray-800 mb-2">회원가입</h1>
+      <p class="text-gray-600 text-sm">음성 채팅에 참여하세요</p>
+    </div>
+
+    <!-- 회원가입 폼 -->
+    <div class="bg-white rounded-3xl shadow-xl p-8">
+      <%= form_for(resource, as: resource_name, url: registration_path(resource_name), 
+                   html: { 
+                     class: "space-y-6",
+                     data: { 
+                       controller: "bridge--form",
+                       bridge__form_submit_title_value: "가입",
+                       action: "input->bridge--form#handleInput"
+                     }
+                   }) do |f| %>
+        <%= render "devise/shared/error_messages", resource: resource %>
+
+        <div>
+          <%= f.label :email, "이메일", class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= f.email_field :email, autofocus: true, autocomplete: "email",
+              class: "w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#F5A08D] focus:ring-2 focus:ring-[#F5A08D] focus:ring-opacity-20 transition-all outline-none",
+              placeholder: "이메일을 입력하세요" %>
+        </div>
+
+        <div>
+          <%= f.label :password, "비밀번호", class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <% if @minimum_password_length %>
+            <p class="text-xs text-gray-500 mb-2">최소 <%= @minimum_password_length %>자 이상</p>
+          <% end %>
+          <%= f.password_field :password, autocomplete: "new-password",
+              class: "w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#F5A08D] focus:ring-2 focus:ring-[#F5A08D] focus:ring-opacity-20 transition-all outline-none",
+              placeholder: "비밀번호를 입력하세요" %>
+        </div>
+
+        <div>
+          <%= f.label :password_confirmation, "비밀번호 확인", class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= f.password_field :password_confirmation, autocomplete: "new-password",
+              class: "w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#F5A08D] focus:ring-2 focus:ring-[#F5A08D] focus:ring-opacity-20 transition-all outline-none",
+              placeholder: "비밀번호를 다시 입력하세요" %>
+        </div>
+
+        <div>
+          <%= f.submit "회원가입", 
+              data: { bridge__form_target: "submit" },
+              class: "w-full py-3 px-4 bg-gradient-to-r from-[#F5A08D] to-[#FFAA91] text-white font-semibold rounded-xl hover:shadow-lg transform hover:scale-[1.02] transition-all duration-200" %>
+        </div>
+      <% end %>
+
+      <!-- 소셜 로그인 -->
+      <div class="mt-6">
+        <div class="relative">
+          <div class="absolute inset-0 flex items-center">
+            <div class="w-full border-t border-gray-200"></div>
+          </div>
+          <div class="relative flex justify-center text-sm">
+            <span class="px-4 bg-white text-gray-500">또는</span>
+          </div>
+        </div>
+
+        <div class="mt-6 space-y-3">
+          <!-- Google 로그인 (비활성화) -->
+          <button disabled class="w-full flex items-center justify-center px-4 py-3 border border-gray-200 rounded-xl bg-gray-50 text-gray-400 cursor-not-allowed">
+            <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24">
+              <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+              <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+              <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+              <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+            </svg>
+            Google로 계속하기
+          </button>
+
+          <!-- Kakao 로그인 (비활성화) -->
+          <button disabled class="w-full flex items-center justify-center px-4 py-3 border border-gray-200 rounded-xl bg-gray-50 text-gray-400 cursor-not-allowed">
+            <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24">
+              <path fill="currentColor" d="M12 3c5.799 0 10.5 3.664 10.5 8.185 0 4.52-4.701 8.184-10.5 8.184a13.5 13.5 0 0 1-1.727-.11l-4.408 2.883c-.501.265-.678.236-.472-.413l.892-3.678c-2.88-1.46-4.785-3.99-4.785-6.866C1.5 6.665 6.201 3 12 3z"/>
+            </svg>
+            카카오로 계속하기
+          </button>
+        </div>
+      </div>
+
+      <!-- 로그인 링크 -->
+      <div class="mt-6 text-center">
+        <p class="text-sm text-gray-600">
+          이미 계정이 있으신가요?
+          <%= link_to "로그인", new_user_session_path, class: "font-semibold text-[#F5A08D] hover:text-[#FFAA91] transition-colors" %>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

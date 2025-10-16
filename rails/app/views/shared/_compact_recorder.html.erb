@@ -1,0 +1,43 @@
+<!-- 컴팩트 녹음 툴바 Partial -->
+<div data-controller="bridge--compact-audio-recorder"
+     data-bridge--compact-audio-recorder-submit-url-value="<%= submit_url %>"
+     data-bridge--compact-audio-recorder-max-duration-value="<%= defined?(max_duration) ? max_duration : 10 %>"
+     class=" z-50 bg-[#E5DDD5] shadow-lg">
+  
+  <div class="relative flex items-center justify-between px-4 py-3">
+    <!-- 미리듣기 버튼 (조건부 표시) - 왼쪽 -->
+    <button type="button"
+            data-action="click->bridge--compact-audio-recorder#togglePlayback"
+            data-bridge--compact-audio-recorder-target="playbackButton"
+            class="invisible w-16 h-16  bg-opacity-20 hover:bg-opacity-30 active:scale-95 transition-all flex items-center justify-center">
+      <!-- 재생 아이콘 -->
+      <%= image_tag "play_btn.png", data: { bridge__compact_audio_recorder_target: "playIcon" }, class: "w-16 h-16" %>
+      <!-- 중지 아이콘 -->
+      <%= image_tag "stop_btn.png", data: { bridge__compact_audio_recorder_target: "stopIcon" }, class: "hidden w-16 h-16" %>
+    </button>
+    
+    <!-- 녹음 버튼 (진행도 포함) - 정중앙 -->
+    <button type="button"
+            data-action="click->bridge--compact-audio-recorder#toggleRecording"
+            data-bridge--compact-audio-recorder-target="recordButton"
+            class="absolute left-1/2 transform -translate-x-1/2 w-16 h-16 rounded-full overflow-hidden hover:scale-105 active:scale-95 transition-transform">
+      <!-- 배경 이미지 -->
+      <%= image_tag "record_btn.png", class: "absolute inset-0 w-18 h-18" %>
+      
+      <!-- 진행도 오버레이 (왼쪽→오른쪽, 어두운 투명 레이어) -->
+      <div data-bridge--compact-audio-recorder-target="recordProgress"
+           class="absolute inset-0 bg-black bg-opacity-40 transition-all duration-100"
+           style="clip-path: inset(0 100% 0 0);"></div>
+    </button>
+    
+    <!-- 제출 버튼 (조건부 표시) - 오른쪽 -->
+    <button type="button"
+            data-action="click->bridge--compact-audio-recorder#submit"
+            data-bridge--compact-audio-recorder-target="submitButton"
+            class="invisible w-16 h-16  bg-opacity-20 hover:bg-opacity-30 active:scale-95 transition-all flex items-center justify-center">
+      <!-- 전송 아이콘 -->
+      <%= image_tag "send_btn.png", class: "w-16 h-16" %>
+    </button>
+  </div>
+</div>
+

@@ -1,0 +1,31 @@
+<!-- Navigation bar를 숨기는 Bridge Component -->
+<div data-controller="bridge--navigation-bar"
+		 data-bridge--navigation-bar-hidden-value="true"
+		 class="hidden"></div>
+
+<div class="container overflow-y-auto">
+	<!-- 메인 콘텐츠 - 상단 safe area, 하단 recorder 높이만큼 패딩 (탭은 safe-area로 처리) -->
+	<div class="px-4 py-4 pt-safe-or-4 pb-[88px]">
+		<% if @recordings&.any? %>
+			<!-- 녹음 목록 -->
+			<div id="recordings_list" 
+			     class="space-y-3"
+			     data-latest-recording-id="<%= @recordings.first&.id || 0 %>">
+				<% @recordings.each do |recording| %>
+					<%= render partial: "feed/record", locals: { recording: recording, animate: false } if recording.audio_file.attached? %>
+				<% end %>
+			</div>
+		<% else %>
+			<div id="recordings_list" 
+			     class="space-y-3"
+			     data-latest-recording-id="0">
+				<p class="text-gray-500 text-center py-8">아직 녹음이 없습니다</p>
+			</div>
+		<% end %>
+	</div>
+</div>
+
+<!-- 컴팩트 녹음 툴바 - 화면 하단에 고정, safe-area로 탭 위에 자동 배치 -->
+<!--<div class="fixed bottom-0 left-0 right-0 pb-safe z-50">-->
+<%#= render partial: 'shared/compact_recorder', locals: { submit_url: recordings_path } %>
+<!--</div>-->
