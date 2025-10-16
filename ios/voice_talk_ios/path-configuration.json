@@ -1,0 +1,62 @@
+{
+  "settings": {
+    "screenshots_enabled": true
+  },
+  "rules": [
+    {
+      "patterns": [
+        "refresh_historical_location"
+      ],
+      "properties": {
+        "presentation": "refresh"
+      }
+    },
+    {
+      "patterns": [
+        "/login$",
+        "/register$",
+        "/password/*"
+      ],
+      "properties": {
+        "context": "modal",
+        "pull_to_refresh_enabled": false,
+      }
+    },
+    {
+      "patterns": [
+        "/feed$",
+        "/$"
+      ],
+      "properties": {
+        "pull_to_refresh_enabled": true
+      }
+    },
+    {
+      "patterns": [
+        "/messages$"
+      ],
+      "properties": {
+        "context": "default",
+        "pull_to_refresh_enabled": false
+      }
+    },
+    {
+      "patterns": [
+        "/settings$"
+      ],
+      "properties": {
+        "context": "default",
+        "pull_to_refresh_enabled": false
+      }
+    },
+    {
+      "patterns": [
+        "/logout$"
+      ],
+      "properties": {
+        "presentation": "clear_all"
+      }
+    }
+  ]
+}
+
