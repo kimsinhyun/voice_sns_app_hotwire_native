@@ -6,6 +6,7 @@ export default class extends BridgeComponent {
   
   // Stimulus Targets
   static targets = [
+    "form", "audioDataInput",
     "recordButton", "recordProgress",
     "playbackButton", "playIcon", "stopIcon",
     "submitButton"
@@ -13,7 +14,6 @@ export default class extends BridgeComponent {
   
   // Stimulus Values
   static values = {
-    submitUrl: String,
     maxDuration: { type: Number, default: 10 }
   }
   
@@ -31,7 +31,6 @@ export default class extends BridgeComponent {
     this.startTime = null
     
     console.log("✅ Audio Recorder connected")
-    console.log("📤 Submit URL:", this.submitUrlValue)
   }
   
   disconnect() {
@@ -254,24 +253,9 @@ export default class extends BridgeComponent {
     
     console.log("📤 Requesting audio data from native...")
     
-    // Native에서 Base64 데이터 가져오기 (callback 방식)
+    // Native에서 Base64 데이터 가져오기
     this.send("getAudioData", {}, (result) => {
       console.log("✅ Audio data result:", result)
-      console.log("📊 Result type:", typeof result)
-      console.log("📊 Result keys:", result ? Object.keys(result) : "null")
-      console.log("📊 Result.data:", result?.data)
-      
-      // 에러 응답 확인
-      if (result?.data?.error) {
-        console.error("❌ Native error:", result.data.error)
-        alert(`업로드 중 오류가 발생했습니다: ${result.data.error}`)
-        
-        if (this.hasSubmitButtonTarget) {
-          this.submitButtonTarget.disabled = false
-          this.submitButtonTarget.classList.remove("opacity-50")
-        }
-        return
-      }
       
       // audioData 확인
       if (!result?.data?.audioData) {
@@ -287,43 +271,12 @@ export default class extends BridgeComponent {
       
       const audioData = result.data.audioData
       console.log("✅ Audio data received:", audioData.length, "chars")
-      console.log("✅ Audio data sample:", audioData.substring(0, 50))
       
-      // Rails 서버로 전송
-      const formData = new FormData()
-      formData.append('recording[audio_data]', audioData)
+      // hidden field에 값 설정
+      this.audioDataInputTarget.value = audioData
       
-      console.log("📤 Uploading to server:", this.submitUrlValue)
-      
-      fetch(this.submitUrlValue, {
-        method: 'POST',
-        body: formData,
-        headers: {
-          'X-CSRF-Token': document.querySelector('[name="csrf-token"]').content
-        }
-      })
-      .then(response => {
-        console.log("📥 Server response status:", response.status)
-        
-        if (response.ok) {
-          console.log("✅ Upload successful")
-          window.location.reload()
-        } else {
-          return response.text().then(errorText => {
-            console.error("❌ Server error:", errorText)
-            throw new Error(`Upload failed: ${response.status}`)
-          })
-        }
-      })
-      .catch(error => {
-        console.error("❌ Upload failed:", error)
-        alert(`업로드 중 오류가 발생했습니다: ${error.message}`)
-        
-        if (this.hasSubmitButtonTarget) {
-          this.submitButtonTarget.disabled = false
-          this.submitButtonTarget.classList.remove("opacity-50")
-        }
-      })
+      // Rails form으로 제출 (Rails가 CSRF, redirect 등 처리)
+      this.formTarget.requestSubmit()
     })
   }
 }

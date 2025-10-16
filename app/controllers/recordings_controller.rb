@@ -6,8 +6,8 @@ class RecordingsController < ApplicationController
     @recording = Recording.create!(user: current_user)
 
     # Base64 데이터가 있는 경우 (네이티브 앱)
-    if params[:recording][:audio_data].present?
-      attach_base64_audio(@recording, params[:recording][:audio_data])
+    if params[:audio_data].present?
+      attach_base64_audio(@recording, params[:audio_data])
     end
 
     redirect_to feed_index_path, notice: "녹음이 저장되었습니다."
@@ -23,7 +23,7 @@ class RecordingsController < ApplicationController
     Rails.logger.info "📦 Decoded: #{audio_data.bytesize} bytes"
 
     # Tempfile 생성
-    tempfile = Tempfile.new(%w[recording .mp3])
+    tempfile = Tempfile.new(["recording", ".mp3"])
     tempfile.binmode
     tempfile.write(audio_data)
     tempfile.rewind
