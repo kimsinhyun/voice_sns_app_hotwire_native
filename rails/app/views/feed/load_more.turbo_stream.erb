@@ -1,7 +1,7 @@
-<% if @recordings.any? %>
-  <%# 새 recordings를 목록 끝에 추가 %>
-  <%= turbo_stream.append "recordings_list" do %>
-    <%= render partial: "feed/record", collection: @recordings, as: :recording %>
+<% if @echos.any? %>
+  <%# 새 echos를 목록 끝에 추가 %>
+  <%= turbo_stream.append "echos_list" do %>
+    <%= render partial: "feed/echo", collection: @echos, as: :echo %>
   <% end %>
 <% end %>
 
@@ -14,9 +14,9 @@
   <%# 더 이상 데이터가 없으면 sentinel 제거하고 controller에 알림 %>
   <%= turbo_stream.remove "infinite_scroll_sentinel" %>
   
-  <%#= turbo_stream.append "recordings_list" do %>
+  <%#= turbo_stream.append "echos_list" do %>
 <!--    <div class="text-center py-8 text-gray-400 text-sm">-->
-<!--      모든 녹음을 불러왔습니다-->
+<!--      모든 메아리를 불러왔습니다-->
 <!--    </div>-->
   <%# end %>
 <% end %>

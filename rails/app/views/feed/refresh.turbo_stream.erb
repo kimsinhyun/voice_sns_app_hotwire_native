@@ -1,12 +1,12 @@
-<% if @new_recordings.any? %>
-  <%= turbo_stream.prepend "recordings_list" do %>
-    <%= render partial: "feed/recordings_batch", locals: { recordings: @new_recordings } %>
+<% if @new_echos.any? %>
+  <%= turbo_stream.prepend "echos_list" do %>
+    <%= render partial: "feed/echos_batch", locals: { echos: @new_echos } %>
   <% end %>
 
   <turbo-stream
     action="dispatch_custom_event"
-    event-name="feed:recordings-updated"
-    event-detail="<%= { latestId: @new_recordings.first.id }.to_json %>">
+    event-name="feed:echos-updated"
+    event-detail="<%= { latestId: @new_echos.first.id }.to_json %>">
   </turbo-stream>
 <% end %>
 

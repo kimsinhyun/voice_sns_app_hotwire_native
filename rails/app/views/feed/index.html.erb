@@ -23,12 +23,12 @@
 	     class="flex-1 overflow-y-auto">
 		<!-- 메인 콘텐츠 - 상단 safe area, 하단 recorder 높이만큼 패딩 (탭은 safe-area로 처리) -->
 		<div class="px-4 py-4 pt-safe-or-4">
-			<% if @recordings&.any? %>
-				<!-- 녹음 목록 -->
-				<div id="recordings_list" 
+			<% if @echos&.any? %>
+				<!-- 메아리 목록 -->
+				<div id="echos_list" 
 				     class="space-y-3"
-				     data-latest-recording-id="<%= @recordings.first&.id || 0 %>">
-					<%= render partial: "feed/record", collection: @recordings, as: :recording %>
+				     data-latest-echo-id="<%= @echos.first&.id || 0 %>">
+					<%= render partial: "feed/echo", collection: @echos, as: :echo %>
 				</div>
 				
 				<!-- 스켈레톤 로더 컨테이너 -->
@@ -41,10 +41,10 @@
 				     data-infinite-scroll-target="sentinel"
 				     class="h-4 w-full"></div>
 			<% else %>
-				<div id="recordings_list" 
+				<div id="echos_list" 
 				     class="space-y-3"
-				     data-latest-recording-id="0">
-					<p class="text-gray-500 text-center py-8">아직 녹음이 없습니다</p>
+				     data-latest-echo-id="0">
+					<p class="text-gray-500 text-center py-8">아직 메아리가 없습니다</p>
 				</div>
 			<% end %>
 		</div>

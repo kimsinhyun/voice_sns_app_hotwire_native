@@ -50,15 +50,15 @@ export default class extends Controller {
     }
 
     this.loadingValue = true
-    console.log("♾️ Loading more recordings...")
+    console.log("♾️ Loading more echos...")
 
     try {
-      // 현재 마지막 recording ID 가져오기
-      const lastId = this.getLastRecordingId()
-      console.log(`♾️ Last recording ID: ${lastId}`)
+      // 현재 마지막 echo ID 가져오기
+      const lastId = this.getLastEchoId()
+      console.log(`♾️ Last echo ID: ${lastId}`)
 
       if (!lastId) {
-        console.error("♾️ No last recording ID found")
+        console.error("♾️ No last echo ID found")
         this.loadingValue = false
         return
       }
@@ -80,7 +80,7 @@ export default class extends Controller {
         // Turbo Stream으로 렌더링
         Turbo.renderStreamMessage(html)
         
-        console.log("✅ More recordings loaded")
+        console.log("✅ More echos loaded")
       } else {
         console.error("❌ Failed to load more:", response.status)
         this.removeSkeleton()
@@ -93,16 +93,16 @@ export default class extends Controller {
     }
   }
 
-  getLastRecordingId() {
-    // recordings_list 내의 모든 recording 카드에서 마지막 ID 추출
-    const listElement = document.getElementById('recordings_list')
+  getLastEchoId() {
+    // echos_list 내의 모든 echo 카드에서 마지막 ID 추출
+    const listElement = document.getElementById('echos_list')
     if (!listElement) return null
 
-    const recordingCards = listElement.querySelectorAll('[data-recording-id]')
-    if (recordingCards.length === 0) return null
+    const echoCards = listElement.querySelectorAll('[data-recording-id]')
+    if (echoCards.length === 0) return null
 
     // 마지막 카드의 data-recording-id 반환
-    const lastCard = recordingCards[recordingCards.length - 1]
+    const lastCard = echoCards[echoCards.length - 1]
     return parseInt(lastCard.dataset.recordingId)
   }
 

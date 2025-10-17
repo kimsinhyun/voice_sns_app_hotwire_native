@@ -1,8 +1,12 @@
-class RecordingsController < ApplicationController
+class EchosController < ApplicationController
   before_action :authenticate_user!, only: [:create]
 
   def create
-    @recording = Recording.create!(user: current_user)
+    # Echo 생성
+    @echo = Echo.create!(user: current_user)
+    
+    # Recording 생성 및 Echo에 연결
+    @recording = Recording.create!(user: current_user, belongable: @echo)
 
     # Base64 데이터가 있는 경우 (네이티브 앱)
     audio_data = params[:audio_data]
@@ -10,38 +14,36 @@ class RecordingsController < ApplicationController
       attach_base64_audio(@recording, audio_data)
     end
 
-    # last_seen_id 이후의 모든 새 recordings 가져오기
+    # last_seen_id 이후의 모든 새 echos 가져오기
     last_seen_id = params[:last_seen_id].to_i
 
-    @new_recordings = if last_seen_id > 0
-                        Recording.includes(:user, audio_file_attachment: :blob)
-                                 .where("id > ?", last_seen_id)
-                                 .order(id: :desc)
-                      else
-                        Recording.where(id: @recording.id)
-                                 .includes(:user, audio_file_attachment: :blob)
-                      end
-
-    # Rails.logger.info "🆕 New recordings after #{last_seen_id}: #{@new_recordings.pluck(:id)}"
+    @new_echos = if last_seen_id > 0
+                   Echo.includes(:user, recording: { audio_file_attachment: :blob })
+                       .where("id > ?", last_seen_id)
+                       .order(id: :desc)
+                 else
+                   Echo.where(id: @echo.id)
+                       .includes(:user, recording: { audio_file_attachment: :blob })
+                 end
 
     respond_to do |format|
       format.turbo_stream {
         render turbo_stream: [
-          # 새 recordings prepend
+          # 새 echos prepend
           turbo_stream.prepend(
-            "recordings_list",
-            partial: "feed/recordings_batch",
-            locals: { recordings: @new_recordings }
+            "echos_list",
+            partial: "feed/echos_batch",
+            locals: { echos: @new_echos }
           ),
           # footer 초기화 (녹음 상태 리셋, CSRF 토큰 갱신)
           turbo_stream.replace(
             "recording_footer",
             partial: "shared/footer",
-            locals: { submit_url: recordings_path }
+            locals: { submit_url: echos_path }
           )
         ]
       }
-      format.html { redirect_to feed_index_path, notice: "녹음이 저장되었습니다." }
+      format.html { redirect_to feed_index_path, notice: "메아리가 저장되었습니다." }
     end
   end
 
@@ -85,3 +87,4 @@ class RecordingsController < ApplicationController
     compressed_file&.unlink
   end
 end
+

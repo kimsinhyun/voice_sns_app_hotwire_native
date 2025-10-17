@@ -3,6 +3,7 @@ class User < ApplicationRecord
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :rememberable, :registerable
 
+  has_many :echos, dependent: :destroy
   has_many :recordings # dependent: :destroy
 
   # Guest 사용자는 device_id만 있고 이메일이 없음

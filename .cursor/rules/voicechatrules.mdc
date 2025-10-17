@@ -1,8 +1,6 @@
 ---
 alwaysApply: true
-description: Ruby on Rails + Hotwire 네이티브 앱 개발 가이드라인
 ---
-
 # 프로젝트 개발 가이드라인
 
 ## 언어 및 응답

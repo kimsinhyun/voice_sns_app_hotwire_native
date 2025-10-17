@@ -1,0 +1,4 @@
+<% echos.each do |echo| %>
+  <%= render partial: "feed/echo", locals: { echo: echo, animate: true } if echo.recording&.audio_file&.attached? %>
+<% end %>
+

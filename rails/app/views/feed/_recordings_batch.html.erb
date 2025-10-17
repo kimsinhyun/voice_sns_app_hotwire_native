@@ -1,4 +1,0 @@
-<% recordings.each do |recording| %>
-  <%= render partial: "feed/record", locals: { recording: recording, animate: true } if recording.audio_file.attached? %>
-<% end %>
-

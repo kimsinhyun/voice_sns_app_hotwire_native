@@ -1,7 +1,7 @@
-<% if recording.audio_file.attached? %>
+<% if echo.recording&.audio_file&.attached? %>
 	<%
-		# 각 카드마다 다른 텍스처 위치를 위한 랜덤 offset (recording.id 기반으로 일관성 유지)
-		random_seed = recording.id || rand(1000)
+		# 각 카드마다 다른 텍스처 위치를 위한 랜덤 offset (echo.id 기반으로 일관성 유지)
+		random_seed = echo.id || rand(1000)
 		offset_x = (random_seed * 37) % 100  # 0-100% 사이
 		offset_y = (random_seed * 73) % 100  # 0-100% 사이
 
@@ -12,8 +12,8 @@
 	<div class="<%= card_classes %>"
 			 style="--texture-offset-x: -<%= offset_x %>%; --texture-offset-y: -<%= offset_y %>%; --texture-image: url('<%= asset_path('paper_texture.jpeg') %>');"
 			 data-controller="audio-player"
-			 data-recording-id="<%= recording.id %>"
-			 data-audio-player-url-value="<%= rails_blob_url(recording.audio_file) %>">
+			 data-recording-id="<%= echo.id %>"
+			 data-audio-player-url-value="<%= rails_blob_url(echo.recording.audio_file) %>">
 
 		<!-- 숨겨진 audio 태그 -->
 		<audio
@@ -23,8 +23,8 @@
                  ended->audio-player#handleEnded
                  error->audio-player#handleError"
 			preload="auto">
-			<source src="<%= rails_blob_url(recording.audio_file) %>"
-							type="<%= recording.audio_file.content_type %>">
+			<source src="<%= rails_blob_url(echo.recording.audio_file) %>"
+							type="<%= echo.recording.audio_file.content_type %>">
 		</audio>
 
 		<div class="flex items-center gap-4">
@@ -71,13 +71,14 @@
 			<!-- 오디오 정보 -->
 			<div class="flex-1 min-w-0">
 				<div class="text-base font-medium text-gray-900 truncate">
-					<%= recording.audio_file.filename %>
+					<%= echo.recording.audio_file.filename %>
 				</div>
 				<div class="text-sm text-gray-500 mt-1">
-					<%= "#{recording.id}: #{number_to_human_size(recording.audio_file.byte_size)}" %>
+					<%= "#{echo.id}: #{number_to_human_size(echo.recording.audio_file.byte_size)}" %>
 				</div>
 			</div>
 		</div>
 	</div>
 
 <% end %>
+

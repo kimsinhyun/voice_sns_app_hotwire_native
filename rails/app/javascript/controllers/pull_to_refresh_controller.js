@@ -22,8 +22,8 @@ export default class extends Controller {
     }
     
     // Custom event listening (Turbo Stream에서 dispatch)
-    this.handleRecordingsUpdatedBound = this.handleRecordingsUpdated.bind(this)
-    window.addEventListener('feed:recordings-updated', this.handleRecordingsUpdatedBound)
+    this.handleEchosUpdatedBound = this.handleEchosUpdated.bind(this)
+    window.addEventListener('feed:echos-updated', this.handleEchosUpdatedBound)
   }
 
   disconnect() {
@@ -33,7 +33,7 @@ export default class extends Controller {
       this.containerTarget.removeEventListener('touchend', this.handleTouchEnd)
     }
     
-    window.removeEventListener('feed:recordings-updated', this.handleRecordingsUpdatedBound)
+    window.removeEventListener('feed:echos-updated', this.handleEchosUpdatedBound)
   }
 
   handleTouchStart(e) {
@@ -117,11 +117,11 @@ export default class extends Controller {
     }
     
     try {
-      // 최신 recording ID 가져오기
-      const latestId = this.getLatestRecordingId()
-      console.log(`🔄 Fetching recordings since ID: ${latestId}`)
+      // 최신 echo ID 가져오기
+      const latestId = this.getLatestEchoId()
+      console.log(`🔄 Fetching echos since ID: ${latestId}`)
       
-      // 새 recordings 요청
+      // 새 echos 요청
       const response = await fetch(`/feed/refresh?since_id=${latestId}`, {
         headers: {
           'Accept': 'text/vnd.turbo-stream.html',
@@ -156,22 +156,22 @@ export default class extends Controller {
     }
   }
 
-  getLatestRecordingId() {
-    const listElement = document.getElementById('recordings_list')
+  getLatestEchoId() {
+    const listElement = document.getElementById('echos_list')
     if (listElement) {
-      return parseInt(listElement.dataset.latestRecordingId) || 0
+      return parseInt(listElement.dataset.latestEchoId) || 0
     }
     return 0
   }
 
-  handleRecordingsUpdated(event) {
+  handleEchosUpdated(event) {
     const { latestId } = event.detail;
     if (!latestId) return;
   
-    const listElement = document.getElementById('recordings_list');
+    const listElement = document.getElementById('echos_list');
     if (listElement) {
-      listElement.dataset.latestRecordingId = latestId;
-      console.log(`✅ [Stimulus] Latest recording ID updated to: ${latestId}`);
+      listElement.dataset.latestEchoId = latestId;
+      console.log(`✅ [Stimulus] Latest echo ID updated to: ${latestId}`);
     }
   }
 }

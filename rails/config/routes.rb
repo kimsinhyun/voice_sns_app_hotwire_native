@@ -38,8 +38,8 @@ Rails.application.routes.draw do
   resources :messages, only: [ :index ]
   resources :settings, only: [ :index ]
 
-  # Recordings routes
-  resources :recordings, only: [ :create ]
+  # Echo routes
+  resources :echos, only: [ :create ]
 
   # Health check
   get "up" => "rails/health#show", as: :rails_health_check
