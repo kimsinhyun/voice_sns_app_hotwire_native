@@ -28,30 +28,43 @@ export default class extends BridgeComponent {
     console.log(`⚠️ Device ID 가져오기 실패 (${this.currentRetry}/${this.maxRetries}):`, error)
     
     if (this.currentRetry < this.maxRetries) {
-      setTimeout(() => this.attemptDeviceLogin(), 1000)
+      setTimeout(() => this.attemptDeviceLogin(), 0) // 즉시 재시도
     } else {
-      console.log("❌ Device login 실패, Devise가 처리합니다")
+      console.log("❌ Device login 실패 (3회 시도)")
+      // 3번 실패 시 에러 메시지 표시
+      const errorEl = document.getElementById('auth_error')
+      if (errorEl) {
+        errorEl.classList.remove('hidden')
+      }
     }
   }
   
-  submitDeviceLogin(deviceId) {
+  async submitDeviceLogin(deviceId) {
     const csrfToken = document.querySelector('[name="csrf-token"]')?.content
     
-    fetch('/auth/device_login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRF-Token': csrfToken
-      },
-      body: JSON.stringify({ device_id: deviceId }),
-      redirect: 'follow'
-    }).then(response => {
-      if (response.redirected) {
-        window.location.href = response.url
+    try {
+      const response = await fetch('/auth/device_login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': csrfToken
+        },
+        body: JSON.stringify({ device_id: deviceId })
+      })
+      
+      const data = await response.json()
+      
+      if (data.success) {
+        console.log("✅ Device login 성공, feed로 이동")
+        // Turbo Visit로 인증된 상태로 feed 다시 방문
+        Turbo.visit(data.redirect_url, { action: 'replace' })
+      } else {
+        this.handleRetry(data.error)
       }
-    }).catch(error => {
+    } catch (error) {
       console.error("❌ Device login 요청 실패:", error)
-    })
+      this.handleRetry(error.message)
+    }
   }
 }
 

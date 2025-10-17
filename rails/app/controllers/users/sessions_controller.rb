@@ -26,7 +26,7 @@ class Users::SessionsController < Devise::SessionsController
     device_id = params[:device_id]
 
     if device_id.blank?
-      redirect_to feed_path
+      return render json: { success: false, error: 'device_id is required' }, status: :bad_request
     end
 
     # device_id로 사용자 찾기 또는 생성
@@ -35,7 +35,7 @@ class Users::SessionsController < Devise::SessionsController
     # 자동 로그인
     sign_in(user)
 
-    # redirect_to root_path, allow_other_host: false
+    render json: { success: true, redirect_url: feed_index_path }
   end
 
   protected
@@ -47,7 +47,7 @@ class Users::SessionsController < Devise::SessionsController
 
   # 로그인 성공 후 리다이렉트 경로
   def after_sign_in_path_for(resource)
-    feed_path
+    feed_index_path
   end
 end
 

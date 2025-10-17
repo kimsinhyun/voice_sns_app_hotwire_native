@@ -1,5 +1,16 @@
 <%= turbo_refreshes_with method: :morph, scroll: :preserve %>
 
+<!-- 로딩 오버레이 (로그인 전에만 표시) -->
+<% unless user_signed_in? %>
+  <div id="auth_overlay" class="fixed inset-0 bg-[#d6d5cc] flex items-center justify-center z-50">
+    <div class="text-center">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-700 mx-auto"></div>
+      <p class="mt-4 text-gray-600">로딩 중...</p>
+      <p id="auth_error" class="hidden mt-2 text-red-600 text-sm">오류가 발생했습니다.</p>
+    </div>
+  </div>
+<% end %>
+
 <!-- Navigation bar를 숨기는 Bridge Component -->
 <div data-controller="bridge--navigation-bar"
 		 data-bridge--navigation-bar-hidden-value="true"
