@@ -25,7 +25,9 @@
     {
       "patterns": [
         "/feed$",
-        "/$"
+        "/$",
+        "/echos/\\d+$",
+        "/chat_rooms/\\d+$"
       ],
       "properties": {
         "pull_to_refresh_enabled": false

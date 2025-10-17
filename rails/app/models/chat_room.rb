@@ -21,7 +21,7 @@ class ChatRoom < ApplicationRecord
   private
 
   def different_users
-    errors.add(:base, "Initiator and responder must be different") if initiator == responder
+    errors.add(:base, "Initiator and responder must be different") if initiator_id == responder_id
   end
 end
 

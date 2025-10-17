@@ -36,7 +36,9 @@
     {
       "patterns": [
         "/feed$",
-        "/$"
+        "/$",
+        "/echos/\\d+$",
+        "/chat_rooms/\\d+$"
       ],
       "properties": {
         "context": "default",
@@ -51,7 +53,8 @@
       "properties": {
         "context": "default",
         "uri": "hotwire://fragment/web",
-        "pull_to_refresh_enabled": true
+        "pull_to_refresh_enabled": false,
+        "comment": "Chat room list"
       }
     },
     {

@@ -43,6 +43,11 @@ Rails.application.routes.draw do
     resources :messages, only: [:create], shallow: false
   end
 
+  # ChatRoom routes
+  resources :chat_rooms, only: [:show] do
+    resources :messages, only: [:create]
+  end
+
   # Health check
   get "up" => "rails/health#show", as: :rails_health_check
 end

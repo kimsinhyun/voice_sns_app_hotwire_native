@@ -12,30 +12,47 @@ class MessagesController < ApplicationController
   end
 
   def create
-    @echo = Echo.find(params[:echo_id])
-
-    # ChatRoom 찾기 or 생성
-    @chat_room = current_user.chat_rooms.find_by(echo_id: @echo.id)
-
-    if @chat_room.nil?
-      # 첫 답장: ChatRoom + Echo 복사 메시지 생성
-      create_chat_room_with_echo_copy
-    else
-      # 턴제 검증
-      last_message = @chat_room.messages.order(:created_at).last
-      if last_message && last_message.user_id == current_user.id
-        return render turbo_stream: [
-          turbo_stream.append(
-            "chat-messages",
-            partial: "shared/error_message",
-            locals: { message: "상대방의 목소리를 기다리고 있습니다" }
-          ),
-          turbo_stream.replace(
-            "recording_footer",
-            partial: "shared/footer_waiting"
-          )
-        ], status: :unprocessable_entity
+    # echo_id 또는 chat_room_id로 접근
+    if params[:echo_id]
+      @echo = Echo.find(params[:echo_id])
+      @chat_room = current_user.chat_rooms.find_by(echo_id: @echo.id)
+      is_first_reply = @chat_room.nil?
+      
+      if is_first_reply
+        # 첫 답장: ChatRoom + Echo 복사 메시지 생성
+        create_chat_room_with_echo_copy
       end
+      
+      submit_url_method = :echo_messages_path
+      submit_url_param = @echo
+    elsif params[:chat_room_id]
+      @chat_room = ChatRoom.find(params[:chat_room_id])
+      @echo = @chat_room.echo
+      is_first_reply = false
+      
+      # 권한 체크
+      unless current_user == @chat_room.initiator || current_user == @chat_room.responder
+        return redirect_to feed_index_path, alert: "접근 권한이 없습니다"
+      end
+      
+      submit_url_method = :chat_room_messages_path
+      submit_url_param = @chat_room
+    end
+
+    # 턴제 검증
+    last_message = @chat_room.messages.order(:created_at).last
+    if last_message && last_message.user_id == current_user.id
+      return render turbo_stream: [
+        turbo_stream.append(
+          "chat-messages",
+          partial: "shared/error_message",
+          locals: { message: "상대방의 목소리를 기다리고 있습니다" }
+        ),
+        turbo_stream.replace(
+          "recording_footer",
+          partial: "shared/footer_waiting"
+        )
+      ], status: :unprocessable_entity
     end
 
     # 새 메시지 생성
@@ -50,10 +67,20 @@ class MessagesController < ApplicationController
 
     respond_to do |format|
       format.turbo_stream {
-        render turbo_stream: [
-          turbo_stream.append("chat-messages", partial: "messages/message", locals: { message: @message }),
-          turbo_stream.replace("recording_footer", partial: "shared/footer", locals: { submit_url: echo_messages_path(@echo) })
+        streams = [
+          turbo_stream.append("chat-messages", partial: "messages/message", 
+                            locals: { message: @message }),
+          turbo_stream.replace("recording_footer", partial: "shared/footer", 
+                              locals: { submit_url: send(submit_url_method, submit_url_param) })
         ]
+        
+        # 첫 답장인 경우 Action Cable 구독 추가
+        if is_first_reply
+          streams << turbo_stream.prepend("chat-messages", 
+                                         partial: "messages/chat_subscription")
+        end
+        
+        render turbo_stream: streams
       }
     end
   end
