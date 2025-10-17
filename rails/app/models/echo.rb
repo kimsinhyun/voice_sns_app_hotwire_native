@@ -1,6 +1,7 @@
 class Echo < ApplicationRecord
   belongs_to :user
   has_one :recording, as: :belongable, dependent: :destroy
+  has_many :chat_rooms, dependent: :destroy
 
   validates :user, presence: true
 

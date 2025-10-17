@@ -1,0 +1,55 @@
+<%= turbo_refreshes_with method: :morph, scroll: :preserve %>
+
+<!-- Navigation bar를 숨기는 Bridge Component -->
+<div data-controller="bridge--navigation-bar"
+     data-bridge--navigation-bar-hidden-value="false"
+     class="hidden"></div>
+
+<% if @is_my_echo %>
+  <!-- Case 1: 내가 올린 Echo - 복수 대화방 목록 -->
+  <div class="p-4 pb-safe-or-4">
+    <h2 class="text-lg font-bold mb-4">이 메아리에 답장한 사람들</h2>
+    
+    <!-- TODO: 각 대화방 클릭 시 Message 목록 표시 (Turbo Frame 사용) -->
+    <% if @chat_rooms.any? %>
+      <% @chat_rooms.each do |chat_room| %>
+        <div class="border p-3 mb-2 rounded bg-white">
+          <p class="font-semibold"><%= chat_room.responder.email %></p>
+          <p class="text-sm text-gray-500">
+            마지막 메시지: <%= chat_room.last_message_at ? time_ago_in_words(chat_room.last_message_at) + " 전" : "없음" %>
+          </p>
+        </div>
+      <% end %>
+    <% else %>
+      <p class="text-gray-500 text-center py-8">아직 답장이 없습니다</p>
+    <% end %>
+  </div>
+<% else %>
+  <!-- Case 2: 남이 올린 Echo - 1:1 대화 화면 -->
+  <div class="flex flex-col h-[100svh]">
+    <!-- Echo 오디오 플레이어 (상단 고정) -->
+    <div class="flex-shrink-0 p-4 border-b bg-gray-50">
+      <p class="text-sm text-gray-600 mb-2">원본 메아리:</p>
+      <%= render partial: "feed/echo", locals: { echo: @echo } if @echo.recording&.audio_file&.attached? %>
+    </div>
+    
+    <!-- Messages 목록 (스크롤 가능) -->
+    <div class="flex-1 overflow-y-auto p-4 pb-safe-or-4" id="chat-messages">
+      <% if @messages.any? %>
+        <% @messages.each do |message| %>
+          <%= render partial: "messages/message", locals: { message: message } %>
+        <% end %>
+      <% else %>
+        <p class="text-gray-500 text-center py-8">답장을 보내 대화를 시작하세요</p>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Footer: 녹음 UI (조건부 렌더링) -->
+  <% if @is_waiting_for_reply %>
+    <%= render "shared/footer_waiting" %>
+  <% else %>
+    <%= render "shared/footer", submit_url: @submit_url %>
+  <% end %>
+<% end %>
+

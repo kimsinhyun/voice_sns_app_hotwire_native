@@ -17,7 +17,7 @@ class Recording < ApplicationRecord
   # 오디오 압축 헬퍼 메서드 (Controller에서 호출)
   def self.compress_audio_file(input_path, output_path)
     Rails.logger.info "🎵 Starting audio compression"
-    
+
     movie = FFMPEG::Movie.new(input_path)
     original_size = File.size(input_path)
 
@@ -31,7 +31,7 @@ class Recording < ApplicationRecord
     reduction = ((1 - compressed_size.to_f / original_size) * 100).round(1)
 
     Rails.logger.info "✅ Compression complete: #{original_size} bytes → #{compressed_size} bytes (#{reduction}% reduction)"
-    
+
     true
   rescue StandardError => e
     Rails.logger.error "❌ Audio compression failed: #{e.message}"

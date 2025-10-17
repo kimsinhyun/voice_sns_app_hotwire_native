@@ -5,6 +5,13 @@ class User < ApplicationRecord
 
   has_many :echos, dependent: :destroy
   has_many :recordings # dependent: :destroy
+  has_many :messages, dependent: :destroy
+  has_many :chat_rooms_as_responder, class_name: "ChatRoom", foreign_key: "responder_id", dependent: :destroy
+  has_many :chat_rooms_as_initiator, class_name: "ChatRoom", foreign_key: "initiator_id", dependent: :destroy
+
+  def chat_rooms
+    ChatRoom.where("initiator_id = ? OR responder_id = ?", id, id)
+  end
 
   # Guest 사용자는 device_id만 있고 이메일이 없음
   validates :device_id, uniqueness: true, allow_nil: true

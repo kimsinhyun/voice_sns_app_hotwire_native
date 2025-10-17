@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_17_023455) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_17_043910) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -77,11 +77,36 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_17_023455) do
     t.index ["unlock_token"], name: "index_admin_users_on_unlock_token", unique: true
   end
 
+  create_table "chat_rooms", force: :cascade do |t|
+    t.bigint "echo_id", null: false
+    t.bigint "initiator_id", null: false
+    t.bigint "responder_id", null: false
+    t.datetime "initiator_left_at"
+    t.datetime "responder_left_at"
+    t.datetime "last_message_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["echo_id", "responder_id"], name: "index_chat_rooms_on_echo_id_and_responder_id", unique: true
+    t.index ["echo_id"], name: "index_chat_rooms_on_echo_id"
+    t.index ["initiator_id"], name: "index_chat_rooms_on_initiator_id"
+    t.index ["responder_id"], name: "index_chat_rooms_on_responder_id"
+  end
+
   create_table "echos", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_echos_on_user_id"
+  end
+
+  create_table "messages", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "chat_room_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["chat_room_id", "created_at"], name: "index_messages_on_chat_room_id_and_created_at"
+    t.index ["chat_room_id"], name: "index_messages_on_chat_room_id"
+    t.index ["user_id"], name: "index_messages_on_user_id"
   end
 
   create_table "recordings", force: :cascade do |t|
@@ -109,6 +134,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_17_023455) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "chat_rooms", "echos"
+  add_foreign_key "chat_rooms", "users", column: "initiator_id"
+  add_foreign_key "chat_rooms", "users", column: "responder_id"
   add_foreign_key "echos", "users"
+  add_foreign_key "messages", "chat_rooms"
+  add_foreign_key "messages", "users"
   add_foreign_key "recordings", "users"
 end

@@ -28,7 +28,7 @@
 		</audio>
 
 		<div class="flex items-center gap-4">
-			<!-- 재생/로딩/중지 버튼 -->
+			<!-- 왼쪽: 재생/로딩/중지 버튼 -->
 			<div class="flex-shrink-0 relative">
 				<!-- 재생 버튼 -->
 				<button
@@ -68,15 +68,29 @@
 				</button>
 			</div>
 
-			<!-- 오디오 정보 -->
-			<div class="flex-1 min-w-0">
-				<div class="text-base font-medium text-gray-900 truncate">
-					<%= echo.recording.audio_file.filename %>
+			<!-- 오른쪽: 오디오 정보 (클릭 시 상세 이동) -->
+			<% if defined?(current_user) && echo.user != current_user %>
+				<!-- 남이 올린 Echo: 클릭하면 상세 화면으로 이동 -->
+				<%= link_to echo_path(echo), data: { turbo_frame: "_top" }, class: "flex-1 min-w-0" do %>
+					<div class="text-base font-medium text-gray-900 truncate">
+						<%= echo.recording.audio_file.filename %>
+					</div>
+					<div class="text-sm text-gray-500 mt-1">
+						<%= "#{echo.id}: #{number_to_human_size(echo.recording.audio_file.byte_size)}" %>
+					</div>
+				<% end %>
+			<% else %>
+				<!-- 내가 올린 Echo: 플레이만 가능 (링크 없음) -->
+				<!-- TODO: 내가 올린 Echo 클릭 시 복수 대화방 목록 표시 기능 필요 -->
+				<div class="flex-1 min-w-0">
+					<div class="text-base font-medium text-gray-900 truncate">
+						<%= echo.recording.audio_file.filename %>
+					</div>
+					<div class="text-sm text-gray-500 mt-1">
+						<%= "#{echo.id}: #{number_to_human_size(echo.recording.audio_file.byte_size)}" %>
+					</div>
 				</div>
-				<div class="text-sm text-gray-500 mt-1">
-					<%= "#{echo.id}: #{number_to_human_size(echo.recording.audio_file.byte_size)}" %>
-				</div>
-			</div>
+			<% end %>
 		</div>
 	</div>
 

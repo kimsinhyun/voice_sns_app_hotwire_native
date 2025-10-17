@@ -29,17 +29,19 @@ Rails.application.routes.draw do
 
   # Feed routes
   # get "feed", to: "feed#index"
-  resources :feed, only: [ :index ] do
+  resources :feed, only: [:index] do
     collection do
       get :refresh
       get :load_more
     end
   end
-  resources :messages, only: [ :index ]
-  resources :settings, only: [ :index ]
+  resources :messages, only: [:index]
+  resources :settings, only: [:index]
 
   # Echo routes
-  resources :echos, only: [ :create ]
+  resources :echos, only: [:create, :show] do
+    resources :messages, only: [:create], shallow: false
+  end
 
   # Health check
   get "up" => "rails/health#show", as: :rails_health_check

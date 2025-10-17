@@ -1,0 +1,19 @@
+<div id="recording_footer">
+  <%= render partial: "shared/request_idfv_bridge" %>
+  
+  <!-- 대기 중 상태: 비활성화된 녹음 UI -->
+  <div class="z-50 bg-[#E5DDD5] scratch opacity-60"
+       style="--texture-offset-x: -20%; --texture-offset-y: -30%; --texture-image: url('<%= asset_path('textured-paper-footer.png') %>');">
+    
+    <div class="relative flex flex-col items-center justify-center px-4 py-4">
+      <!-- 비활성화된 녹음 버튼 -->
+      <div class="w-16 h-16 rounded-full overflow-hidden opacity-40">
+        <%= image_tag "record_btn.png", class: "w-18 h-18" %>
+      </div>
+      
+      <!-- 대기 메시지 -->
+      <p class="text-xs text-gray-600 mt-2 text-center">상대방의 목소리를 기다리는 중...</p>
+    </div>
+  </div>
+</div>
+
