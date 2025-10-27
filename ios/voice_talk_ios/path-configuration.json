@@ -5,6 +5,29 @@
   "rules": [
     {
       "patterns": [
+        "/feed$",
+        "/$",
+        "/echos/\\d+$",
+        "/chat_rooms/\\d+$"
+      ],
+      "properties": {
+        "pull_to_refresh_enabled": false,
+        "navigation_bar_hidden": true
+      }
+    },
+    {
+      "patterns": [
+        "/messages$",
+        "/settings$"
+      ],
+      "properties": {
+        "context": "default",
+        "pull_to_refresh_enabled": false,
+        "navigation_bar_hidden": true
+      }
+    },
+    {
+      "patterns": [
         "refresh_historical_location"
       ],
       "properties": {
@@ -19,35 +42,6 @@
       ],
       "properties": {
         "context": "modal",
-        "pull_to_refresh_enabled": false
-      }
-    },
-    {
-      "patterns": [
-        "/feed$",
-        "/$",
-        "/echos/\\d+$",
-        "/chat_rooms/\\d+$"
-      ],
-      "properties": {
-        "pull_to_refresh_enabled": false
-      }
-    },
-    {
-      "patterns": [
-        "/messages$"
-      ],
-      "properties": {
-        "context": "default",
-        "pull_to_refresh_enabled": false
-      }
-    },
-    {
-      "patterns": [
-        "/settings$"
-      ],
-      "properties": {
-        "context": "default",
         "pull_to_refresh_enabled": false
       }
     },

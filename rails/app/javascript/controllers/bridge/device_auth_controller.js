@@ -9,10 +9,12 @@ export default class extends BridgeComponent {
   
   connect() {
     super.connect()
+    console.log("✅ device-auth controller connected!")
     this.attemptDeviceLogin()
   }
   
   attemptDeviceLogin() {
+    console.log("✅ attemptDeviceLogin called!")
     // Callback 방식 사용 (BridgeComponent.md 참고)
     this.send("getDeviceId", {}, (result) => {
       if (result?.data?.deviceId) {
@@ -28,7 +30,7 @@ export default class extends BridgeComponent {
     console.log(`⚠️ Device ID 가져오기 실패 (${this.currentRetry}/${this.maxRetries}):`, error)
     
     if (this.currentRetry < this.maxRetries) {
-      setTimeout(() => this.attemptDeviceLogin(), 0) // 즉시 재시도
+      setTimeout(() => this.attemptDeviceLogin(), 300) // 즉시 재시도
     } else {
       console.log("❌ Device login 실패 (3회 시도)")
       // 3번 실패 시 에러 메시지 표시
@@ -40,6 +42,8 @@ export default class extends BridgeComponent {
   }
   
   async submitDeviceLogin(deviceId) {
+    console.log("✅ submitDeviceLogin called!")
+    console.log("✅ deviceId:", deviceId)
     const csrfToken = document.querySelector('[name="csrf-token"]')?.content
     
     try {

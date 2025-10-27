@@ -12,6 +12,7 @@ final class DeviceAuthComponent: BridgeComponent {
     override class var name: String { "device-auth" }
     
     override func onReceive(message: Message) {
+        print("message:  \(message.event)")
         switch message.event {
         case "getDeviceId":
             handleGetDeviceId(message: message)

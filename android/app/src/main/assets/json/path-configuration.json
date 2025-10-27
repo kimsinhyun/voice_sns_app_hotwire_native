@@ -42,7 +42,7 @@
       ],
       "properties": {
         "context": "default",
-        "uri": "hotwire://fragment/web",
+        "uri": "hotwire://fragment/web/without-toolbar",
         "pull_to_refresh_enabled": false
       }
     },
@@ -52,7 +52,7 @@
       ],
       "properties": {
         "context": "default",
-        "uri": "hotwire://fragment/web",
+        "uri": "hotwire://fragment/web/without-toolbar",
         "pull_to_refresh_enabled": false,
         "comment": "Chat room list"
       }

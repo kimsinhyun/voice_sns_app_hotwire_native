@@ -12,11 +12,12 @@
 <% end %>
 
 <!-- Navigation bar를 숨기는 Bridge Component -->
-<div data-controller="bridge--navigation-bar"
-		 data-bridge--navigation-bar-hidden-value="true"
-		 class="hidden"></div>
+<!--<div data-controller="bridge--navigation-bar"-->
+<!--		 data-bridge--navigation-bar-hidden-value="true"-->
+<!--		 class="hidden"></div>-->
 
-<div class="relative flex flex-col h-full" data-controller="pull-to-refresh infinite-scroll">
+<%# <div class="relative flex flex-col h-full" data-controller="pull-to-refresh infinite-scroll"> %>
+<div class="relative flex flex-col h-full">
 	<!-- Pull to refresh 스피너 -->
 	<div data-pull-to-refresh-target="spinner" 
 	     class="fixed top-0 left-1/2 -translate-x-1/2 z-50 

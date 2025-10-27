@@ -1,5 +1,6 @@
 <div id="recording_footer">
-  <%= render partial: "shared/request_idfv_bridge" %>
+  <%#= render partial: "shared/request_idfv_bridge" %>
+	<div data-controller="bridge--device-auth"></div>
   <!-- 컴팩트 녹음 툴바 Partial -->
   <%= form_with(
     url: submit_url,
