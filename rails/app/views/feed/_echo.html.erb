@@ -1,16 +1,11 @@
 <% if echo.recording&.audio_file&.attached? %>
 	<%
 		# 각 카드마다 다른 텍스처 위치를 위한 랜덤 offset (echo.id 기반으로 일관성 유지)
-		random_seed = echo.id || rand(1000)
-		offset_x = (random_seed * 37) % 100  # 0-100% 사이
-		offset_y = (random_seed * 73) % 100  # 0-100% 사이
-
 		# 애니메이션 클래스 조건부 추가 (Turbo Stream으로 prepend될 때만)
-		base_classes = "bg-white/70 backdrop-blur-sm rounded-2xl shadow-md p-4 mb-3 border border-white/50 scratch"
+		base_classes = "bg-white/70 backdrop-blur-sm rounded-2xl shadow-md p-4 mb-3 border border-white/50"
 		card_classes = local_assigns[:animate] ? "recording-card-enter #{base_classes}" : base_classes
 	%>
 	<div class="<%= card_classes %>"
-			 style="--texture-offset-x: -<%= offset_x %>%; --texture-offset-y: -<%= offset_y %>%; --texture-image: url('<%= asset_path('paper_texture.jpeg') %>');"
 			 data-controller="audio-player"
 			 data-recording-id="<%= echo.id %>"
 			 data-audio-player-url-value="<%= rails_blob_url(echo.recording.audio_file) %>">

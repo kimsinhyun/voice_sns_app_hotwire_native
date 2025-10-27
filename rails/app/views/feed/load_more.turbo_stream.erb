@@ -13,11 +13,5 @@
 <% unless @has_more %>
   <%# 더 이상 데이터가 없으면 sentinel 제거하고 controller에 알림 %>
   <%= turbo_stream.remove "infinite_scroll_sentinel" %>
-  
-  <%#= turbo_stream.append "echos_list" do %>
-<!--    <div class="text-center py-8 text-gray-400 text-sm">-->
-<!--      모든 메아리를 불러왔습니다-->
-<!--    </div>-->
-  <%# end %>
 <% end %>
 
