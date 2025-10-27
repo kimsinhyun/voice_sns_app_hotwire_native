@@ -1,7 +1,7 @@
 require "streamio-ffmpeg"
 
 class Recording < ApplicationRecord
-  belongs_to :user
+  # belongs_to :user
   belongs_to :belongable, polymorphic: true
   has_one_attached :audio_file
 

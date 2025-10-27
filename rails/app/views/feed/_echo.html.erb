@@ -5,7 +5,8 @@
 		base_classes = "bg-white/70 backdrop-blur-sm rounded-2xl shadow-md p-4 mb-3 border border-white/50"
 		card_classes = local_assigns[:animate] ? "recording-card-enter #{base_classes}" : base_classes
 	%>
-	<div class="<%= card_classes %>"
+	<div id="echo_<%= echo.id %>"
+			 class="<%= card_classes %>"
 			 data-controller="audio-player"
 			 data-recording-id="<%= echo.id %>"
 			 data-audio-player-url-value="<%= rails_blob_url(echo.recording.audio_file) %>">
@@ -63,41 +64,41 @@
 				</button>
 			</div>
 
-		<!-- 오른쪽: 오디오 정보 (클릭 시 상세 이동) -->
-		<% if defined?(current_user) && echo.user == current_user %>
-			<!-- 내가 올린 Echo: 클릭하면 ChatRoom 목록으로 이동 -->
-			<%= link_to echo_path(echo), data: { turbo_frame: "_top" }, class: "flex-1 min-w-0" do %>
-				<div class="text-base font-medium text-gray-900 truncate">
-					<%= echo.recording.audio_file.filename %>
-				</div>
-				<div class="text-sm text-gray-500 mt-1">
-					<%= "#{echo.id}: #{number_to_human_size(echo.recording.audio_file.byte_size)}" %>
-				</div>
+			<!-- 오른쪽: 오디오 정보 (클릭 시 상세 이동) -->
+			<% if defined?(current_user) && echo.user == current_user %>
+				<!-- 내가 올린 Echo: 클릭하면 ChatRoom 목록으로 이동 -->
+				<%= link_to echo_path(echo), data: { turbo_frame: "_top" }, class: "flex-1 min-w-0" do %>
+					<div class="text-base font-medium text-gray-900 truncate">
+						<%= "#{echo.id}: #{echo.recording.audio_file.filename}" %>
+					</div>
+					<div class="text-sm text-gray-500 mt-1">
+						<%= "#{echo.id}: #{number_to_human_size(echo.recording.audio_file.byte_size)}" %>
+					</div>
 					<div class="text-sm text-gray-500 mt-1">
 						<%= "current_user_id: #{current_user&.id}" %>
 					</div>
+				<% end %>
+			<% elsif defined?(current_user) && echo.user != current_user %>
+				<!-- 남이 올린 Echo: 클릭하면 1:1 대화 화면으로 이동 -->
+				<%= link_to echo_path(echo), data: { turbo_frame: "_top" }, class: "flex-1 min-w-0" do %>
+					<div class="text-base font-medium text-gray-900 truncate">
+						<%= echo.recording.audio_file.filename %>
+					</div>
+					<div class="text-sm text-gray-500 mt-1">
+						<%= "#{echo.id}: #{number_to_human_size(echo.recording.audio_file.byte_size)}" %>
+					</div>
+				<% end %>
+			<% else %>
+				<!-- 로그인하지 않은 경우 -->
+				<div class="flex-1 min-w-0">
+					<div class="text-base font-medium text-gray-900 truncate">
+						<%= echo.recording.audio_file.filename %>
+					</div>
+					<div class="text-sm text-gray-500 mt-1">
+						<%= "#{echo.id}: #{number_to_human_size(echo.recording.audio_file.byte_size)}" %>
+					</div>
+				</div>
 			<% end %>
-		<% elsif defined?(current_user) && echo.user != current_user %>
-			<!-- 남이 올린 Echo: 클릭하면 1:1 대화 화면으로 이동 -->
-			<%= link_to echo_path(echo), data: { turbo_frame: "_top" }, class: "flex-1 min-w-0" do %>
-				<div class="text-base font-medium text-gray-900 truncate">
-					<%= echo.recording.audio_file.filename %>
-				</div>
-				<div class="text-sm text-gray-500 mt-1">
-					<%= "#{echo.id}: #{number_to_human_size(echo.recording.audio_file.byte_size)}" %>
-				</div>
-			<% end %>
-		<% else %>
-			<!-- 로그인하지 않은 경우 -->
-			<div class="flex-1 min-w-0">
-				<div class="text-base font-medium text-gray-900 truncate">
-					<%= echo.recording.audio_file.filename %>
-				</div>
-				<div class="text-sm text-gray-500 mt-1">
-					<%= "#{echo.id}: #{number_to_human_size(echo.recording.audio_file.byte_size)}" %>
-				</div>
-			</div>
-		<% end %>
 		</div>
 	</div>
 

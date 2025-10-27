@@ -27,6 +27,9 @@ extension SceneController: UIWindowSceneDelegate {
 
 extension SceneController: NavigatorDelegate {
     func handle(proposal: VisitProposal, from navigator: Navigator) -> ProposalResult {
+        // Turbo Native는 기본적으로 pull-to-refresh를 지원합니다.
+        // 사용자가 pull-to-refresh를 하면 현재 페이지를 자동으로 재방문(reload)합니다.
+        
         // 특정 화면의 경우 커스텀 viewController 사용
         let navigationController = navigator.rootViewController
         let hidden = (proposal.properties["navigation_bar_hidden"] as? Bool) ?? false

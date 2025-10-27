@@ -11,23 +11,10 @@
   </div>
 <% end %>
 
-<%# <div class="relative flex flex-col h-full" data-controller="pull-to-refresh infinite-scroll"> %>
-<div class="relative flex flex-col h-full" data-controller="pull-to-refresh infinite-scroll">
-	<!-- Pull to refresh 스피너 -->
-	<div data-pull-to-refresh-target="spinner" 
-	     class="fixed top-0 left-1/2 -translate-x-1/2 z-50 
-	            opacity-0 transition-all duration-300 pointer-events-none">
-		<svg class="w-8 h-8 text-blue-500" fill="none" viewBox="0 0 24 24">
-			<circle class="opacity-25" cx="12" cy="12" r="10" 
-			        stroke="currentColor" stroke-width="4"></circle>
-			<path class="opacity-75" fill="currentColor" 
-			      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-		</svg>
-	</div>
-	
+<!-- Turbo Native의 기본 pull-to-refresh 사용 (네이티브 UI) -->
+<div class="relative flex flex-col h-full" data-controller="infinite-scroll">
 	<!-- 스크롤 가능한 컨테이너 -->
-	<div data-pull-to-refresh-target="container" 
-	     class="flex-1 overflow-y-auto">
+	<div class="flex-1 overflow-y-auto">
 		<!-- 메인 콘텐츠 - 상단 safe area, 하단 recorder 높이만큼 패딩 (탭은 safe-area로 처리) -->
 		<div class="px-4 py-4 pt-safe-or-4">
 			<% if @echos&.any? %>

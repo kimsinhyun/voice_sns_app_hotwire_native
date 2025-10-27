@@ -11,7 +11,7 @@
         "/chat_rooms/\\d+$"
       ],
       "properties": {
-        "pull_to_refresh_enabled": false,
+        "pull_to_refresh_enabled": true,
         "navigation_bar_hidden": true
       }
     },

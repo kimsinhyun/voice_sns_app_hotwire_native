@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_17_043910) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_27_021931) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -110,13 +110,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_17_043910) do
   end
 
   create_table "recordings", force: :cascade do |t|
-    t.bigint "user_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "belongable_type", null: false
     t.bigint "belongable_id", null: false
     t.index ["belongable_type", "belongable_id"], name: "index_recordings_on_belongable"
-    t.index ["user_id"], name: "index_recordings_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -140,5 +138,4 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_17_043910) do
   add_foreign_key "echos", "users"
   add_foreign_key "messages", "chat_rooms"
   add_foreign_key "messages", "users"
-  add_foreign_key "recordings", "users"
 end

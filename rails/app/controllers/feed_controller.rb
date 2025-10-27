@@ -12,17 +12,7 @@ class FeedController < ApplicationController
     @submit_url = echos_path
   end
 
-  def refresh
-    since_id = params[:since_id].to_i
-
-    @new_echos = Echo.includes(:user, recording: { audio_file_attachment: :blob })
-                     .where("id > ?", since_id)
-                     .order(id: :desc)
-
-    respond_to do |format|
-      format.turbo_stream
-    end
-  end
+  # refresh 액션 제거: Turbo Native의 pull-to-refresh가 자동으로 index를 재호출
 
   def load_more
     last_id = params[:last_id].to_i

@@ -117,7 +117,7 @@
       transform: translateY(0) scale(1);
     }
   }
-  
+
   /* 새로 추가된 recording 카드에 애니메이션 적용 */
   .recording-card-enter {
     animation: slideInFromTop 0.3s cubic-bezier(0.4, 0, 0.2, 1);

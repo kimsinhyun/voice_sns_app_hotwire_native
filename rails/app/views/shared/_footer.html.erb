@@ -12,8 +12,7 @@
       bridge__audio_recorder_submit_url_value: submit_url,
       bridge__audio_recorder_max_duration_value: (defined?(max_duration) ? max_duration : 10)
     },
-    class: "z-50 bg-[#E5DDD5] scratch",
-    style: "--texture-offset-x: -20%; --texture-offset-y: -30%; --texture-image: url('#{asset_path('textured-paper-footer.png')}');"
+    class: "z-50 bg-[#E5DDD5]"
   ) do |form| %>
   <%= form.hidden_field :audio_data, data: { bridge__audio_recorder_target: "audioDataInput" } %>
   <%= form.hidden_field :last_seen_id, data: { bridge__audio_recorder_target: "lastSeenIdInput" } %>

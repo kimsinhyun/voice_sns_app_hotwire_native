@@ -31,7 +31,7 @@ Rails.application.routes.draw do
   # get "feed", to: "feed#index"
   resources :feed, only: [:index] do
     collection do
-      get :refresh
+      # refresh 라우트 제거: Turbo Native의 pull-to-refresh가 자동으로 index를 재호출
       get :load_more
     end
   end
